@@ -1,0 +1,65 @@
+[
+  {
+    "id": "t1",
+    "year": "2021",
+    "title": "The First Spark • Started Coding",
+    "company": "Self-Directed Learning",
+    "description": "Began writing code, exploring algorithmic logic, data structures, and the foundational mechanics of software. Built early web scripts and discovered a passion for creative technology.",
+    "type": "education",
+    "tech_stack": ["Python", "C++", "HTML/CSS", "JavaScript"]
+  },
+  {
+    "id": "t2",
+    "year": "2022",
+    "title": "Started B.Tech in AI & Machine Learning",
+    "company": "Academic Foundation",
+    "description": "Enrolled in B.Tech focusing on Artificial Intelligence and Machine Learning. Immersed in neural networks, mathematical optimization, model training pipelines, and computer vision.",
+    "type": "education",
+    "tech_stack": ["Python", "NumPy", "Pandas", "Scikit-Learn", "PyTorch"]
+  },
+  {
+    "id": "t3",
+    "year": "2023",
+    "title": "Built Sri Sai Traders Platform",
+    "company": "Enterprise Engineering",
+    "description": "Designed, architected, and deployed a full-stack commercial web application managing inventory, automated billing, and logistics tracking with real-time transactional workflows.",
+    "type": "experience",
+    "tech_stack": ["React", "Node.js", "Express", "MongoDB", "Tailwind CSS"]
+  },
+  {
+    "id": "t4",
+    "year": "2024",
+    "title": "Built AI Resume Screening System",
+    "company": "Machine Learning Innovation",
+    "description": "Engineered an intelligent ML platform parsing candidate resumes, computing multi-dimensional match scores via NLP, and automating talent recruitment workflows with high accuracy.",
+    "type": "experience",
+    "tech_stack": ["Python", "Scikit-Learn", "Streamlit", "FastAPI", "NLP"]
+  },
+  {
+    "id": "t5",
+    "year": "2024 - PRESENT",
+    "title": "Started @ i2Flow",
+    "company": "i2Flow Technologies",
+    "description": "Stepped into the role of Lead Creative Technologist. Architecting modern web infrastructure, leading motion engineering, and building production-ready AI agent interfaces.",
+    "type": "experience",
+    "tech_stack": ["React", "TypeScript", "GSAP", "Python", "Supabase", "Three.js"]
+  },
+  {
+    "id": "t6",
+    "year": "2025 - PRESENT",
+    "title": "Created Portfolio OS",
+    "company": "Creative Technology Showcase",
+    "description": "Crafted an Awwwards-grade luxury digital world incorporating 60 FPS GSAP motion design, physical depth parallax, live GitHub API synchronization, and a macOS application showcase viewer.",
+    "type": "experience",
+    "tech_stack": ["React", "TypeScript", "GSAP", "Lenis", "Three.js", "Vite"]
+  },
+  {
+    "id": "t7",
+    "year": "FUTURE VISION",
+    "title": "Next-Gen Autonomous AI Agents & Beyond",
+    "company": "Pioneering the Future",
+    "description": "Pioneering autonomous AI agentic workflows, multi-modal generative neural interfaces, and spatial web experiences that redefine how humans interact with intelligent systems.",
+    "type": "experience",
+    "tech_stack": ["Generative AI", "LLM Fine-Tuning", "Spatial Web", "Agentic Systems"]
+  }
+]

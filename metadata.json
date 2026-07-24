@@ -1,0 +1,6 @@
+{
+  "name": "Creative Portfolio",
+  "description": "A premium, award-winning style dark luxury interactive portfolio website featuring Framer Motion, Lenis smooth scroll, and GSAP.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,17 @@
+[
+  {
+    "category": "Frontend Engineering",
+    "skills": ["React", "TypeScript", "Vite", "GSAP", "Framer Motion", "Tailwind CSS", "Three.js", "WebGL"],
+    "proficiency": "Expert"
+  },
+  {
+    "category": "Design",
+    "skills": ["UI/UX Design", "Motion Design", "Interaction Design", "Prototyping", "Design Systems", "Figma"],
+    "proficiency": "Expert"
+  },
+  {
+    "category": "Tools",
+    "skills": ["Git", "Blender", "Linear", "VS Code"],
+    "proficiency": "Advanced"
+  }
+]

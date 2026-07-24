@@ -1,0 +1,62 @@
+[
+  {
+    "id": "ai-resume-screening-system",
+    "title": "ai-resume-screening-system",
+    "description": "An intelligent ML platform that parses resumes, calculates candidate job match scores, and automates talent recruitment workflows.",
+    "technologies": ["Python", "Scikit-Learn", "Streamlit", "NLP", "TF-IDF"],
+    "category": "Machine Learning",
+    "githubUrl": "https://github.com/kskreddy2k7/ai-resume-screening-system",
+    "liveUrl": null,
+    "language": "Python"
+  },
+  {
+    "id": "kranthu-ai-portfolio",
+    "title": "kranthu-ai-portfolio",
+    "description": "Personal portfolio blending AI engineering highlights with 60 FPS motion design.",
+    "technologies": ["React", "TypeScript", "GSAP", "Lenis", "Tailwind CSS"],
+    "category": "Creative Engineering",
+    "githubUrl": "https://github.com/kskreddy2k7/kranthu-ai-portfolio",
+    "liveUrl": null,
+    "language": "TypeScript"
+  },
+  {
+    "id": "sri-sai-traders-website",
+    "title": "Sri Sai Traders website",
+    "description": "A full-stack enterprise inventory, billing, and logistics management platform built for trade tracking.",
+    "technologies": ["React", "Node.js", "Express", "MongoDB", "Tailwind CSS"],
+    "category": "Full Stack",
+    "githubUrl": "https://github.com/kskreddy2k7/sri-sai-traders-website",
+    "liveUrl": null,
+    "language": "TypeScript"
+  },
+  {
+    "id": "i2flow",
+    "title": "i2flow",
+    "description": "A digital brand experience representing the i2Flow identity, merging AI insights with fluid interfaces.",
+    "technologies": ["React", "TypeScript", "Framer Motion", "Tailwind CSS"],
+    "category": "Web Experience",
+    "githubUrl": "https://github.com/kskreddy2k7/i2flow",
+    "liveUrl": null,
+    "language": "TypeScript"
+  },
+  {
+    "id": "builderestate",
+    "title": "Builderestate",
+    "description": "A modern real estate portal featuring interactive 3D property tours, mortgage calculators, and lead management.",
+    "technologies": ["Next.js", "TypeScript", "Three.js", "Tailwind CSS", "Firebase"],
+    "category": "Real Estate Tech",
+    "githubUrl": "https://github.com/kskreddy2k7/builderestate",
+    "liveUrl": null,
+    "language": "TypeScript"
+  },
+  {
+    "id": "nizams-royal-restaurant",
+    "title": "nizams-royal-restaurant",
+    "description": "A digital culinary experience featuring online table reservations, interactive menus, and order tracking.",
+    "technologies": ["React", "JavaScript", "Tailwind CSS", "Node.js"],
+    "category": "Web Application",
+    "githubUrl": "https://github.com/kskreddy2k7/nizams-royal-restaurant",
+    "liveUrl": null,
+    "language": "JavaScript"
+  }
+]

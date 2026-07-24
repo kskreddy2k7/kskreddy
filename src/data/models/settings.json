@@ -1,0 +1,13 @@
+{
+  "theme": "Elegant Dark",
+  "seo": {
+    "title": "K S K Reddy | Creative Director & Frontend Engineer",
+    "description": "Portfolio of K S K Reddy (i2Flow). Specializing in premium web experiences, motion design, and frontend engineering.",
+    "ogImage": null
+  },
+  "features": {
+    "showResume": false,
+    "enableCustomCursor": true,
+    "enableSmoothScroll": true
+  }
+}
