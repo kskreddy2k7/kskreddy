@@ -105,7 +105,7 @@ export default function Skills() {
     <section
       id="skills"
       ref={containerRef}
-      className="py-32 relative bg-[#08060A] text-[#F5F5F5] overflow-hidden z-[10]"
+      className="py-20 md:py-24 relative bg-[#08060A] text-[#F5F5F5] overflow-hidden z-[10]"
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,_rgba(88,28,135,0.10)_0%,_transparent_65%)] pointer-events-none z-0" />
       <div className="absolute inset-0 bg-[radial-gradient(#C084FC_1px,_transparent_1px)] [background-size:40px_40px] opacity-[0.07] pointer-events-none z-0" />
@@ -113,7 +113,7 @@ export default function Skills() {
       <div className="max-w-7xl mx-auto px-6 relative z-[10]">
 
         {/* Header */}
-        <div ref={headingRef} className="mb-20 flex flex-col items-center text-center">
+        <div ref={headingRef} className="mb-12 md:mb-14 flex flex-col items-center text-center">
           <div className="inline-flex items-center gap-2 border border-[#C084FC]/20 px-3.5 py-1 rounded-full bg-[#2D122D]/40 mb-4 backdrop-blur-md">
             <span className="w-1.5 h-1.5 rounded-full bg-[#FDBA74] animate-pulse" />
             <span className="text-[10px] uppercase tracking-[0.22em] text-[#C084FC] font-outfit font-medium">CAPABILITIES & ARSENAL</span>
@@ -127,7 +127,7 @@ export default function Skills() {
         </div>
 
         {/* Category Cluster Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6">
           {categoryNames.map((catName, idx) => {
             const catTechs = ARSENAL_TECHS.filter(t => t.category === catName);
             const totalRepos = catTechs.reduce((acc, t) => acc + getTechUsageCount(t.name), 0);
@@ -136,7 +136,7 @@ export default function Skills() {
             return (
               <div
                 key={catName}
-                className="arsenal-category p-6 md:p-8 rounded-3xl bg-[#120B18]/60 border border-white/10 hover:border-[#C084FC]/30 backdrop-blur-xl transition-all duration-400 shadow-[0_20px_60px_rgba(0,0,0,0.8)] opacity-0"
+                className="arsenal-category p-6 md:p-8 rounded-3xl bg-[#120B18]/60 border border-white/10 hover:border-[#C084FC]/30 backdrop-blur-xl transition-all duration-400 shadow-[0_20px_60px_rgba(0,0,0,0.8)]"
               >
                 <div className="flex justify-between items-start mb-6 border-b border-white/10 pb-4">
                   <div>
