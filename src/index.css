@@ -20,6 +20,16 @@
   @keyframes shimmer {
     100% { transform: translateX(100%); }
   }
+
+  @keyframes loading-bar {
+    0% { transform: translateX(-100%); width: 30%; }
+    50% { transform: translateX(100%); width: 70%; }
+    100% { transform: translateX(300%); width: 30%; }
+  }
+}
+
+.loading-bar-animate {
+  animation: loading-bar 1.5s ease-in-out infinite;
 }
 
 @layer base {
@@ -41,7 +51,7 @@
 
   :where(a, button, input, textarea, select, [role="button"]):focus-visible {
     outline: 0;
-    box-shadow: 0 0 0 2px rgba(8, 6, 10, 1), 0 0 0 4px rgba(192, 132, 252, 0.7);
+    box-shadow: 0 0 0 2px #08060A, 0 0 0 4px #C084FC;
   }
 
   @media (pointer: coarse) {
@@ -92,13 +102,39 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  overflow-x: clip;
   cursor: none;
 }
 
 /* Hide default cursor on links/buttons */
 a, button, [role="button"], input, textarea, select {
   cursor: none;
+}
+
+/* System cursor override for Developer Control Center */
+body.show-system-cursor {
+  cursor: auto !important;
+}
+
+body.show-system-cursor a,
+body.show-system-cursor button,
+body.show-system-cursor [role="button"],
+body.show-system-cursor select,
+body.show-system-cursor .cursor-pointer {
+  cursor: pointer !important;
+}
+
+body.show-system-cursor input,
+body.show-system-cursor textarea {
+  cursor: text !important;
+}
+
+body.show-system-cursor .cursor-grab {
+  cursor: grab !important;
+}
+
+body.show-system-cursor .cursor-grabbing {
+  cursor: grabbing !important;
 }
 
 /* Lenis smooth scroll */
@@ -132,6 +168,30 @@ html.lenis, html.lenis body {
   position: relative;
   display: inline-block;
   animation: pulse-glow-flower 2.5s infinite ease-in-out;
+}
+.animate-blob {
+  animation: blob 10s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(0.95); opacity: 0.6; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+.animate-breathe {
+  animation: breathe 5s ease-in-out infinite;
+}
+
+.animate-breathe-delayed {
+  animation: breathe 6s ease-in-out infinite 1.5s;
 }
 .blinking-dot::after {
   content: '';

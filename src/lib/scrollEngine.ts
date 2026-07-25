@@ -57,6 +57,7 @@ export function initScrollEngine(): Lenis {
     markers: false,
   });
 
+  // Centralized resize refresh manager
   resizeHandler = () => {
     if (resizeTimeout) {
       clearTimeout(resizeTimeout);
@@ -67,6 +68,13 @@ export function initScrollEngine(): Lenis {
   };
 
   window.addEventListener('resize', resizeHandler);
+
+  // Initial refresh after layout & fonts load
+  if (typeof document !== 'undefined') {
+    document.fonts?.ready?.then(() => {
+      ScrollTrigger.refresh();
+    });
+  }
 
   requestAnimationFrame(() => {
     ScrollTrigger.refresh();
@@ -88,7 +96,7 @@ export function getLenis(): Lenis | null {
   return lenisInstance;
 }
 
-export function scrollToTarget(target: string | Element, offset = 0) {
+export function scrollToTarget(target: string | HTMLElement | number, offset = 0) {
   const lenis = lenisInstance;
 
   if (lenis) {
@@ -100,7 +108,7 @@ export function scrollToTarget(target: string | Element, offset = 0) {
   }
 
   const element = typeof target === 'string' ? document.querySelector(target) : target;
-  if (!element) {
+  if (!element || typeof element === 'number') {
     return false;
   }
 

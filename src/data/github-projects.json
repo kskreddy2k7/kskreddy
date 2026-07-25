@@ -1,0 +1,132 @@
+[
+  {
+    "id": "1147274852",
+    "name": "ai-resume-screening-system",
+    "description": "AI Resume Screening System using Python & ML",
+    "readme_summary": "Create, Edit, Analyze, Optimize and Export Professional Resumes Using AI.",
+    "github_url": "https://github.com/kskreddy2k7/ai-resume-screening-system",
+    "homepage": "https://kskreddy2k7.github.io/ai-resume-screening-system/",
+    "language": "TypeScript",
+    "topics": [
+      "ai",
+      "candidate-ranking",
+      "machine-learning",
+      "nlp",
+      "python",
+      "resume-parser",
+      "typescript"
+    ],
+    "stars": 1,
+    "forks": 0,
+    "updated_at": "25 Jun 2026",
+    "created_at": "1 Feb 2026",
+    "license": null,
+    "is_open_source": true,
+    "image": "/projects/ai-resume-screening-system/cover.png"
+  },
+  {
+    "id": "1187399795",
+    "name": "-Sri-Sai-Traders-website",
+    "description": "Modern responsive business website for Sri Sai Traders, Kurnool showcasing products, services, and contact details.",
+    "readme_summary": "🌐 Live Website: https://kskreddy2k7.github.io/-Sri-Sai-Traders-website/",
+    "github_url": "https://github.com/kskreddy2k7/-Sri-Sai-Traders-website",
+    "homepage": "https://kskreddy2k7.github.io/-Sri-Sai-Traders-website/",
+    "language": "CSS",
+    "topics": [
+      "business-website",
+      "css",
+      "grocery-store",
+      "html",
+      "india",
+      "javascript",
+      "portfolio",
+      "portfolio-web-development",
+      "responsive-design",
+      "small-business",
+      "ui-ux"
+    ],
+    "stars": 1,
+    "forks": 0,
+    "updated_at": "21 Mar 2026",
+    "created_at": "20 Mar 2026",
+    "license": null,
+    "is_open_source": true,
+    "image": "/projects/-Sri-Sai-Traders-website/cover.png"
+  },
+  {
+    "id": "1264978058",
+    "name": "i2flow",
+    "description": "",
+    "readme_summary": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
+    "github_url": "https://github.com/kskreddy2k7/i2flow",
+    "homepage": "https://kskreddy2k7.github.io/i2flow/",
+    "language": "TypeScript",
+    "topics": [
+      "typescript"
+    ],
+    "stars": 1,
+    "forks": 0,
+    "updated_at": "14 Jun 2026",
+    "created_at": "10 Jun 2026",
+    "license": null,
+    "is_open_source": true,
+    "image": "/projects/i2flow/cover.png"
+  },
+  {
+    "id": "1259447408",
+    "name": "Builderestate",
+    "description": "",
+    "readme_summary": "> One platform for builders, brokers, buyers, contractors, site engineers, and suppliers.",
+    "github_url": "https://github.com/kskreddy2k7/Builderestate",
+    "homepage": null,
+    "language": "TypeScript",
+    "topics": [
+      "typescript"
+    ],
+    "stars": 0,
+    "forks": 0,
+    "updated_at": "4 Jun 2026",
+    "created_at": "4 Jun 2026",
+    "license": null,
+    "is_open_source": true,
+    "image": "/projects/Builderestate/cover.png"
+  },
+  {
+    "id": "1285069581",
+    "name": "nizams-royal-restaurant",
+    "description": "",
+    "readme_summary": "> \"I've never seen a restaurant website like this.\"",
+    "github_url": "https://github.com/kskreddy2k7/nizams-royal-restaurant",
+    "homepage": "https://kskreddy2k7.github.io/nizams-royal-restaurant/",
+    "language": "TypeScript",
+    "topics": [
+      "typescript"
+    ],
+    "stars": 0,
+    "forks": 0,
+    "updated_at": "30 Jun 2026",
+    "created_at": "30 Jun 2026",
+    "license": null,
+    "is_open_source": true,
+    "image": "/projects/nizams-royal-restaurant/cover.png"
+  },
+  {
+    "id": "1210340600",
+    "name": "EvoDoc-Flow",
+    "description": "",
+    "readme_summary": "A modern, role-based healthcare web application designed to streamline patient intake, appointment scheduling, and clinical workflows for real-world c...",
+    "github_url": "https://github.com/kskreddy2k7/EvoDoc-Flow",
+    "homepage": "https://evo-doc-flow.vercel.app",
+    "language": "TypeScript",
+    "topics": [
+      "typescript"
+    ],
+    "stars": 0,
+    "forks": 0,
+    "updated_at": "14 Apr 2026",
+    "created_at": "14 Apr 2026",
+    "license": null,
+    "is_open_source": true,
+    "image": "/projects/EvoDoc-Flow/cover.png"
+  }
+]

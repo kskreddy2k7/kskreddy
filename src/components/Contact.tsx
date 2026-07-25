@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -6,489 +6,563 @@ import SplitType from 'split-type';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// ─── Contact Data ─────────────────────────────────────────────────────────────
-const LINKS = [
-  {
-    id: 'email',
-    label: 'Direct Mail',
-    value: 'official.i2flow.ai@gmail.com',
-    href: 'mailto:official.i2flow.ai@gmail.com',
-    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>`,
-    color: '#FDBA74',
-    glow: 'rgba(253,186,116,0.18)',
-  },
+// ─── Social Links ─────────────────────────────────────────────────────────────
+const SOCIALS = [
   {
     id: 'github',
-    label: 'Source Code',
-    value: 'github.com/kskreddy2k7',
-    href: 'https://github.com/kskreddy2k7',
-    icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>`,
-    color: '#C084FC',
-    glow: 'rgba(192,132,252,0.18)',
+    label: 'GitHub',
+    handle: '@kskreddy2k7',
+    desc: '6 pinned repositories · AI, React, TypeScript',
+    url: 'https://github.com/kskreddy2k7',
+    accentColor: '#E6EDF3',
+    bgGlow: 'rgba(230,237,243,0.06)',
+    borderGlow: 'rgba(230,237,243,0.18)',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+      </svg>
+    ),
   },
   {
     id: 'linkedin',
-    label: 'Professional Network',
-    value: 'linkedin.com/in/kskreddy',
-    href: 'https://www.linkedin.com/in/kata-sai-kranthu-reddy-b02848377/',
-    icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`,
-    color: '#60A5FA',
-    glow: 'rgba(96,165,250,0.18)',
+    label: 'LinkedIn',
+    handle: 'Kata Sai Kranthu Reddy',
+    desc: 'Open to internship opportunities',
+    url: 'https://www.linkedin.com/in/kata-sai-kranthu-reddy-b02848377',
+    accentColor: '#0A66C2',
+    bgGlow: 'rgba(10,102,194,0.1)',
+    borderGlow: 'rgba(10,102,194,0.35)',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+      </svg>
+    ),
   },
   {
     id: 'instagram',
-    label: 'Visual Studio',
-    value: '@i2flow.ai',
-    href: 'https://www.instagram.com/i2flow.ai/',
-    icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>`,
-    color: '#F472B6',
-    glow: 'rgba(244,114,182,0.18)',
+    label: 'Instagram',
+    handle: '@i2flow.ai',
+    desc: 'AI experiments · dev journey · projects',
+    url: 'https://www.instagram.com/i2flow.ai/',
+    accentColor: '#E1306C',
+    bgGlow: 'rgba(225,48,108,0.08)',
+    borderGlow: 'rgba(225,48,108,0.3)',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+      </svg>
+    ),
   },
   {
-    id: 'brand',
-    label: 'Brand Studio',
-    value: 'i2flow.ai',
-    href: 'https://kskreddy2k7.github.io/i2flow/',
-    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
-    color: '#FDBA74',
-    glow: 'rgba(253,186,116,0.18)',
+    id: 'website',
+    label: 'i2Flow',
+    handle: 'i2flow.ai project',
+    desc: 'Live web experiment · Vite · React',
+    url: 'https://kskreddy2k7.github.io/i2flow/',
+    accentColor: '#C084FC',
+    bgGlow: 'rgba(192,132,252,0.08)',
+    borderGlow: 'rgba(192,132,252,0.3)',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="2" y1="12" x2="22" y2="12"/>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+      </svg>
+    ),
+  },
+  {
+    id: 'email',
+    label: 'Email',
+    handle: 'official.i2flow.ai@gmail.com',
+    desc: 'Open to collaborations & opportunities',
+    url: 'mailto:official.i2flow.ai@gmail.com',
+    accentColor: '#FDBA74',
+    bgGlow: 'rgba(253,186,116,0.08)',
+    borderGlow: 'rgba(253,186,116,0.3)',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
+    ),
   },
 ];
 
-// ─── Floating Particles ───────────────────────────────────────────────────────
-function FloatingParticles() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    let animId: number;
-    const resize = () => { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; };
-    resize();
-    window.addEventListener('resize', resize);
-    const COLORS = ['#C084FC', '#FDBA74', '#F472B6', '#EA580C', '#8B5CF6'];
-    const pts = Array.from({ length: 40 }, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      r: Math.random() * 1.4 + 0.4,
-      vx: (Math.random() - 0.5) * 0.15,
-      vy: -(Math.random() * 0.3 + 0.06),
-      a: Math.random() * 0.4 + 0.1,
-      color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      drift: Math.random() * Math.PI * 2,
-      ds: Math.random() * 0.007 + 0.003,
-    }));
-    const tick = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      pts.forEach(p => {
-        p.drift += p.ds;
-        p.x += p.vx + Math.sin(p.drift) * 0.2;
-        p.y += p.vy;
-        if (p.y < -8) { p.y = canvas.height + 8; p.x = Math.random() * canvas.width; }
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.globalAlpha = p.a;
-        ctx.fill();
-        ctx.globalAlpha = 1;
-      });
-      animId = requestAnimationFrame(tick);
-    };
-    tick();
-    return () => { cancelAnimationFrame(animId); window.removeEventListener('resize', resize); };
-  }, []);
-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none z-[2]" />;
-}
-
-// ─── Link Card ────────────────────────────────────────────────────────────────
-function LinkCard({ link }: { link: typeof LINKS[0] }) {
-  const cardRef = useRef<HTMLAnchorElement>(null);
-  const shineRef = useRef<HTMLDivElement>(null);
+// ─── Social Card ──────────────────────────────────────────────────────────────
+function SocialCard({ social }: { social: typeof SOCIALS[0] }) {
   const [hovered, setHovered] = useState(false);
-
-  const onMove = useCallback((e: React.MouseEvent) => {
-    const card = cardRef.current;
-    const shine = shineRef.current;
-    if (!card || !shine) return;
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    gsap.to(card, { rotateX: ((y - rect.height / 2) / rect.height) * -5, rotateY: ((x - rect.width / 2) / rect.width) * 5, scale: 1.03, duration: 0.3, ease: 'power2.out', transformPerspective: 700, force3D: true });
-    gsap.to(shine, { opacity: 1, left: `${(x / rect.width) * 100}%`, top: `${(y / rect.height) * 100}%`, duration: 0.12 });
-  }, []);
-
-  const onLeave = useCallback(() => {
-    gsap.to(cardRef.current, { rotateX: 0, rotateY: 0, scale: 1, duration: 0.5, ease: 'power3.out' });
-    gsap.to(shineRef.current, { opacity: 0, duration: 0.35 });
-    setHovered(false);
-  }, []);
+  const isEmail = social.id === 'email';
 
   return (
     <a
-      ref={cardRef}
-      href={link.href}
-      target={link.id !== 'email' ? '_blank' : undefined}
-      rel="noreferrer"
-      className="group relative flex items-center gap-4 px-5 py-4 rounded-2xl overflow-hidden no-underline"
+      href={social.url}
+      target={isEmail ? undefined : '_blank'}
+      rel={isEmail ? undefined : 'noopener noreferrer'}
+      className="group relative flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 select-none"
       style={{
-        background: 'rgba(13,8,20,0.8)',
-        border: `1px solid ${hovered ? link.color + '44' : 'rgba(255,255,255,0.09)'}`,
-        boxShadow: hovered ? `0 12px 40px rgba(0,0,0,0.85), 0 0 20px ${link.glow}` : '0 4px 20px rgba(0,0,0,0.5)',
+        background: hovered ? `rgba(18,11,24,0.9)` : 'rgba(18,11,24,0.5)',
+        border: `1px solid ${hovered ? social.borderGlow : 'rgba(255,255,255,0.06)'}`,
+        boxShadow: hovered
+          ? `0 8px 30px ${social.bgGlow}, 0 0 0 1px ${social.borderGlow}, inset 0 1px 0 rgba(255,255,255,0.07)`
+          : 'none',
+        transform: hovered ? 'translateY(-4px)' : 'none',
         backdropFilter: 'blur(20px)',
-        transformStyle: 'preserve-3d',
-        transition: 'border-color 0.3s, box-shadow 0.3s',
       }}
-      onMouseMove={onMove}
       onMouseEnter={() => setHovered(true)}
-      onMouseLeave={onLeave}
+      onMouseLeave={() => setHovered(false)}
     >
-      <div ref={shineRef} className="absolute w-24 h-24 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none opacity-0 z-[1]"
-        style={{ background: `radial-gradient(circle, ${link.glow} 0%, transparent 65%)` }} />
-      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-        style={{ background: `linear-gradient(135deg, ${link.color}0F 0%, transparent 55%)` }} />
+      {/* Reflection sweep */}
+      {hovered && (
+        <div
+          className="absolute inset-0 rounded-2xl pointer-events-none overflow-hidden"
+        >
+          <div
+            className="absolute -left-full top-0 w-1/2 h-full opacity-10"
+            style={{
+              background: `linear-gradient(90deg, transparent, ${social.accentColor}, transparent)`,
+              animation: 'sweep 0.5s ease-out forwards',
+            }}
+          />
+        </div>
+      )}
 
       {/* Icon */}
-      <div className="w-9 h-9 shrink-0 rounded-xl flex items-center justify-center border relative z-[5] transition-all duration-350"
+      <div
+        className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300"
         style={{
-          background: hovered ? link.color + '18' : 'rgba(255,255,255,0.03)',
-          borderColor: hovered ? link.color + '55' : 'rgba(255,255,255,0.08)',
-          color: hovered ? link.color : '#6B6380',
-          boxShadow: hovered ? `0 0 16px ${link.glow}` : 'none',
+          background: hovered ? `${social.accentColor}22` : 'rgba(255,255,255,0.04)',
+          color: hovered ? social.accentColor : 'rgba(255,255,255,0.5)',
+          border: `1px solid ${hovered ? social.accentColor + '40' : 'rgba(255,255,255,0.06)'}`,
+          boxShadow: hovered ? `0 0 16px ${social.accentColor}30` : 'none',
+          transform: hovered ? 'scale(1.08)' : 'scale(1)',
         }}
       >
-        <div className="w-4 h-4" dangerouslySetInnerHTML={{ __html: link.icon }} />
+        {social.icon}
       </div>
 
       {/* Text */}
-      <div className="flex flex-col min-w-0 relative z-[5]">
-        <span className="text-[9px] font-outfit uppercase tracking-[0.22em] mb-0.5 transition-colors duration-300"
-          style={{ color: hovered ? link.color : '#4A4358' }}>
-          {link.label}
-        </span>
-        <span className="text-sm font-general font-medium truncate transition-colors duration-300"
-          style={{ color: hovered ? '#F5F5F5' : '#9087A0' }}>
-          {link.value}
-        </span>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-0.5">
+          <span
+            className="font-outfit text-[11px] uppercase tracking-[0.22em] font-bold transition-colors duration-300"
+            style={{ color: hovered ? social.accentColor : 'rgba(255,255,255,0.4)' }}
+          >
+            {social.label}
+          </span>
+        </div>
+        <p className="font-outfit text-[13px] text-white/80 truncate font-medium">{social.handle}</p>
+        <p className="font-outfit text-[10px] text-white/35 truncate mt-0.5">{social.desc}</p>
       </div>
 
       {/* Arrow */}
-      <svg className="ml-auto w-4 h-4 shrink-0 relative z-[5] transition-all duration-300"
-        style={{ color: hovered ? link.color : '#2E2840', transform: hovered ? 'translate(3px,-3px)' : 'none' }}
-        viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M7 17L17 7M17 7H7M17 7v10" strokeLinecap="round" strokeLinejoin="round" />
+      <svg
+        viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+        className="w-4 h-4 shrink-0 transition-all duration-300"
+        style={{
+          color: hovered ? social.accentColor : 'rgba(255,255,255,0.2)',
+          transform: hovered ? 'translate(2px, -2px)' : 'translate(0,0)',
+        }}
+      >
+        <line x1="7" y1="17" x2="17" y2="7"/>
+        <polyline points="7 7 17 7 17 17"/>
       </svg>
     </a>
   );
 }
 
-// ─── Float Label Input ────────────────────────────────────────────────────────
-function FloatInput({ label, type = 'text', isTextarea = false, required = true, placeholder }: {
-  label: string; type?: string; isTextarea?: boolean; required?: boolean; placeholder: string;
-}) {
-  const [focused, setFocused] = useState(false);
-  const [filled, setFilled] = useState(false);
-  const lineRef = useRef<HTMLDivElement>(null);
-
-  const onFocus = () => {
-    setFocused(true);
-    if (lineRef.current) gsap.to(lineRef.current, { scaleX: 1, duration: 0.4, ease: 'power2.out' });
-  };
-  const onBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFocused(false);
-    setFilled(e.target.value.length > 0);
-    if (!e.target.value) gsap.to(lineRef.current, { scaleX: 0, duration: 0.3, ease: 'power2.in' });
-  };
-
-  const up = focused || filled;
-  const shared: React.CSSProperties = { background: 'transparent', color: '#F5F5F5', outline: 'none', width: '100%', paddingTop: '28px', paddingBottom: '10px', fontSize: '15px', fontFamily: 'Outfit, sans-serif', resize: 'none', border: 'none' };
-
-  return (
-    <div className="relative">
-      <label className="absolute pointer-events-none font-outfit z-[5] transition-all duration-250"
-        style={{ top: up ? '8px' : '20px', left: 0, fontSize: up ? '10px' : '14px', letterSpacing: up ? '0.18em' : '0.01em', textTransform: up ? 'uppercase' : 'none', color: focused ? '#C084FC' : up ? '#6B6380' : '#4A4358' }}>
-        {label}
-      </label>
-      <div className="relative border-b" style={{ borderBottomColor: focused ? 'rgba(192,132,252,0.4)' : 'rgba(255,255,255,0.1)' }}>
-        {isTextarea
-          ? <textarea required={required} rows={4} placeholder={focused ? placeholder : ''} onFocus={onFocus} onBlur={onBlur} style={shared} className="placeholder:text-[#3D3549] placeholder:text-sm" />
-          : <input required={required} type={type} placeholder={focused ? placeholder : ''} onFocus={onFocus} onBlur={onBlur} style={shared} className="placeholder:text-[#3D3549] placeholder:text-sm" />
-        }
-        <div ref={lineRef} className="absolute bottom-0 left-0 right-0 h-[2px] origin-left rounded-sm"
-          style={{ transform: 'scaleX(0)', background: 'linear-gradient(90deg,#C084FC,#FDBA74,#F472B6)' }} />
-      </div>
-    </div>
-  );
-}
-
-// ─── Main ─────────────────────────────────────────────────────────────────────
-export default function Contact() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const innerRef = useRef<HTMLDivElement>(null);
-  const headingRef = useRef<HTMLHeadingElement>(null);
-  const subRef = useRef<HTMLParagraphElement>(null);
-  const labelRef = useRef<HTMLDivElement>(null);
-  const formCardRef = useRef<HTMLDivElement>(null);
-  const linksColRef = useRef<HTMLDivElement>(null);
-  const btnRef = useRef<HTMLButtonElement>(null);
-  const bgGlowRef = useRef<HTMLDivElement>(null);
-  const footerRef = useRef<HTMLDivElement>(null);
+// ─── Contact Form ─────────────────────────────────────────────────────────────
+function ContactForm() {
   const formRef = useRef<HTMLFormElement>(null);
-
   const [formState, setFormState] = useState<'idle' | 'submitting' | 'success'>('idle');
-
-  // Drifting ambient orb
-  useEffect(() => {
-    if (!bgGlowRef.current) return;
-    gsap.to(bgGlowRef.current, { x: 70, y: -50, duration: 9, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-  }, []);
-
-  // Mouse parallax on form card
-  useEffect(() => {
-    const section = sectionRef.current;
-    const card = formCardRef.current;
-    if (!section || !card) return;
-    let rafId: number;
-    let tx = 0, ty = 0, cx = 0, cy = 0;
-    const onMove = (e: MouseEvent) => {
-      const rect = section.getBoundingClientRect();
-      tx = ((e.clientX - rect.left - rect.width / 2) / rect.width) * 7;
-      ty = ((e.clientY - rect.top - rect.height / 2) / rect.height) * 4;
-    };
-    const lerp = () => {
-      cx += (tx - cx) * 0.05; cy += (ty - cy) * 0.05;
-      gsap.set(card, { x: cx, y: cy });
-      rafId = requestAnimationFrame(lerp);
-    };
-    rafId = requestAnimationFrame(lerp);
-    section.addEventListener('mousemove', onMove);
-    return () => { cancelAnimationFrame(rafId); section.removeEventListener('mousemove', onMove); };
-  }, []);
-
-  // GSAP scroll reveals — use 'top bottom' so they fire as soon as section enters viewport
-  useGSAP(() => {
-    if (!sectionRef.current) return;
-
-    // Set initial hidden states via GSAP (not inline styles so they're properly tracked)
-    gsap.set([headingRef.current, subRef.current, labelRef.current], { opacity: 0, y: 40 });
-    gsap.set(formCardRef.current, { opacity: 0, x: -60 });
-    gsap.set(footerRef.current, { opacity: 0, y: 20 });
-
-    const links = linksColRef.current?.querySelectorAll('a, [class*="avail"]');
-    if (links) gsap.set(links, { opacity: 0, x: 50 });
-
-    // Section becomes visible as soon as ANY part enters viewport
-    ScrollTrigger.create({
-      trigger: sectionRef.current,
-      start: 'top bottom',
-      once: true,
-      invalidateOnRefresh: true,
-      onEnter: () => {
-        const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-
-        // Label
-        tl.to(labelRef.current, { opacity: 1, y: 0, duration: 0.7 }, 0);
-
-        // Heading — SplitType
-        if (headingRef.current && !headingRef.current.querySelector('.word')) {
-          const split = new SplitType(headingRef.current, { types: 'words' });
-          if (split.words) {
-            gsap.set(split.words, { opacity: 0, y: 50 });
-            tl.to(split.words, { opacity: 1, y: 0, duration: 1.0, stagger: 0.06 }, 0.1);
-          }
-        } else {
-          tl.to(headingRef.current, { opacity: 1, y: 0, duration: 1.0 }, 0.1);
-        }
-
-        // Subtext
-        tl.to(subRef.current, { opacity: 1, y: 0, duration: 0.9 }, 0.3);
-
-        // Form card
-        tl.to(formCardRef.current, { opacity: 1, x: 0, duration: 1.1 }, 0.25);
-
-        // Link cards
-        if (links) {
-          tl.to(links, { opacity: 1, x: 0, duration: 0.8, stagger: 0.08 }, 0.35);
-        }
-
-        // Footer
-        tl.to(footerRef.current, { opacity: 1, y: 0, duration: 0.8 }, 0.5);
-      },
-    });
-  }, { scope: sectionRef });
-
-  // Button magnetic
-  const onBtnMove = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    const btn = btnRef.current;
-    if (!btn) return;
-    const rect = btn.getBoundingClientRect();
-    gsap.to(btn, { x: (e.clientX - rect.left - rect.width / 2) * 0.13, y: (e.clientY - rect.top - rect.height / 2) * 0.13, duration: 0.3, ease: 'power2.out' });
-  }, []);
-  const onBtnLeave = useCallback(() => { gsap.to(btnRef.current, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1,0.4)' }); }, []);
+  const [focused, setFocused] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormState('submitting');
-    setTimeout(() => { setFormState('success'); setTimeout(() => { setFormState('idle'); (e.target as HTMLFormElement).reset(); }, 3500); }, 1600);
+    setTimeout(() => {
+      setFormState('success');
+      setTimeout(() => setFormState('idle'), 4000);
+    }, 1800);
   };
 
+  const fieldClass = (id: string) => `
+    w-full bg-transparent py-3.5 font-outfit text-[14px] text-white
+    placeholder-transparent focus:outline-none resize-none transition-all duration-300
+    border-b-2 ${focused === id ? 'border-[#C084FC]' : 'border-white/10'}
+  `;
+
+  const labelClass = (id: string, hasValue?: boolean) => `
+    absolute left-0 font-outfit text-[11px] uppercase tracking-[0.2em] transition-all duration-300 pointer-events-none
+    ${focused === id || hasValue ? '-top-1 text-[#C084FC]' : 'top-3.5 text-white/40 text-[13px] normal-case tracking-normal'}
+  `;
+
   return (
-    <section
-      id="contact"
-      ref={sectionRef}
-      className="relative text-[#F5F5F5] overflow-hidden z-[10]"
-      style={{ background: '#08060A', minHeight: '100vh', paddingTop: '9rem', paddingBottom: '5rem' }}
+    <form
+      ref={formRef}
+      onSubmit={handleSubmit}
+      className="relative flex flex-col gap-8 p-8 md:p-10 rounded-3xl"
+      style={{
+        background: 'rgba(18,11,24,0.7)',
+        border: '1px solid rgba(255,255,255,0.07)',
+        backdropFilter: 'blur(28px)',
+        boxShadow: '0 30px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
+      }}
     >
-      {/* ── Solid base ── */}
-      <div className="absolute inset-0 bg-[#08060A] z-0" />
+      {/* Top accent */}
+      <div className="absolute top-0 left-8 right-8 h-[1px] rounded-full"
+        style={{ background: 'linear-gradient(to right, transparent, rgba(192,132,252,0.5), transparent)' }} />
 
-      {/* ── Layered ambient flower gradients ── */}
-      <div className="absolute inset-0 z-[1] pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 90% 70% at 15% 85%, rgba(88,28,135,0.24) 0%, transparent 65%)' }} />
-      <div className="absolute inset-0 z-[1] pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 65% 50% at 85% 15%, rgba(234,88,12,0.13) 0%, transparent 55%)' }} />
-      <div className="absolute inset-0 z-[1] pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 55% 45% at 50% 105%, rgba(244,114,182,0.11) 0%, transparent 65%)' }} />
+      {/* Form header */}
+      <div className="flex flex-col gap-1">
+        <h3 className="font-playfair text-xl font-normal text-white">Send a message</h3>
+        <p className="font-outfit text-[12px] text-white/40">I typically respond within 24 hours.</p>
+      </div>
 
-      {/* ── Drifting orb ── */}
-      <div ref={bgGlowRef} className="absolute z-[1] pointer-events-none rounded-full"
-        style={{ width: '480px', height: '480px', left: '12%', top: '18%', background: 'radial-gradient(circle, rgba(192,132,252,0.09) 0%, rgba(88,28,135,0.06) 45%, transparent 70%)', filter: 'blur(50px)' }} />
+      {/* Name */}
+      <div className="relative">
+        <input
+          type="text"
+          id="ct-name"
+          required
+          className={fieldClass('name')}
+          placeholder="Name"
+          onFocus={() => setFocused('name')}
+          onBlur={() => setFocused(null)}
+        />
+        <label htmlFor="ct-name" className={labelClass('name')}>Full Name</label>
+        {focused === 'name' && (
+          <div className="absolute bottom-0 left-0 h-[2px] w-full rounded-full"
+            style={{ background: 'linear-gradient(to right, #C084FC, #FDBA74)', animation: 'expand 0.3s ease-out' }} />
+        )}
+      </div>
 
-      {/* ── Dot grid ── */}
-      <div className="absolute inset-0 z-[1] pointer-events-none"
-        style={{ backgroundImage: 'radial-gradient(rgba(192,132,252,1) 1px, transparent 1px)', backgroundSize: '36px 36px', opacity: 0.07 }} />
+      {/* Email */}
+      <div className="relative">
+        <input
+          type="email"
+          id="ct-email"
+          required
+          className={fieldClass('email')}
+          placeholder="Email"
+          onFocus={() => setFocused('email')}
+          onBlur={() => setFocused(null)}
+        />
+        <label htmlFor="ct-email" className={labelClass('email')}>Email Address</label>
+        {focused === 'email' && (
+          <div className="absolute bottom-0 left-0 h-[2px] w-full rounded-full"
+            style={{ background: 'linear-gradient(to right, #C084FC, #FDBA74)', animation: 'expand 0.3s ease-out' }} />
+        )}
+      </div>
 
-      {/* ── Particles ── */}
-      <FloatingParticles />
+      {/* Subject */}
+      <div className="relative">
+        <input
+          type="text"
+          id="ct-subject"
+          className={fieldClass('subject')}
+          placeholder="Subject"
+          onFocus={() => setFocused('subject')}
+          onBlur={() => setFocused(null)}
+        />
+        <label htmlFor="ct-subject" className={labelClass('subject')}>Subject (optional)</label>
+        {focused === 'subject' && (
+          <div className="absolute bottom-0 left-0 h-[2px] w-full rounded-full"
+            style={{ background: 'linear-gradient(to right, #C084FC, #FDBA74)', animation: 'expand 0.3s ease-out' }} />
+        )}
+      </div>
 
-      {/* ── Content ── */}
-      <div ref={innerRef} className="relative z-[10] max-w-7xl mx-auto px-6">
+      {/* Message */}
+      <div className="relative">
+        <textarea
+          id="ct-message"
+          required
+          rows={4}
+          className={fieldClass('message')}
+          placeholder="Message"
+          onFocus={() => setFocused('message')}
+          onBlur={() => setFocused(null)}
+        />
+        <label htmlFor="ct-message" className={labelClass('message')}>Your Message</label>
+        {focused === 'message' && (
+          <div className="absolute bottom-0 left-0 h-[2px] w-full rounded-full"
+            style={{ background: 'linear-gradient(to right, #C084FC, #FDBA74)', animation: 'expand 0.3s ease-out' }} />
+        )}
+      </div>
 
-        {/* Header */}
-        <div className="mb-14 flex flex-col items-center text-center">
-          <div ref={labelRef} className="inline-flex items-center gap-2.5 border border-[#C084FC]/20 px-4 py-1.5 rounded-full bg-[#2D122D]/40 mb-6 backdrop-blur-md">
-            <span className="w-2 h-2 rounded-full bg-[#FDBA74] animate-pulse" style={{ boxShadow: '0 0 8px rgba(253,186,116,0.7)' }} />
-            <span className="text-[10px] font-outfit uppercase tracking-[0.26em] text-[#C084FC] font-medium">Open for Collaboration</span>
+      {/* Submit */}
+      <button
+        type="submit"
+        disabled={formState !== 'idle'}
+        className="relative overflow-hidden rounded-xl py-4 font-outfit font-bold text-[12px] uppercase tracking-[0.18em] transition-all duration-500"
+        style={{
+          background: formState === 'success'
+            ? 'linear-gradient(135deg, #34D399, #10B981)'
+            : 'linear-gradient(135deg, #C084FC, #A855F7)',
+          color: '#0A070E',
+          boxShadow: formState === 'success'
+            ? '0 0 30px rgba(52,211,153,0.4)'
+            : '0 0 30px rgba(192,132,252,0.35)',
+          transform: formState === 'idle' ? 'none' : 'scale(0.99)',
+        }}
+      >
+        <span className={`block transition-transform duration-300 ${formState !== 'idle' ? '-translate-y-10' : 'translate-y-0'}`}>
+          Send Message ↗
+        </span>
+        <span className={`absolute inset-0 flex items-center justify-center transition-transform duration-300 ${formState === 'submitting' ? 'translate-y-0' : 'translate-y-10'}`}>
+          <span className="w-5 h-5 border-2 border-[#0A070E]/30 border-t-[#0A070E] rounded-full animate-spin" />
+        </span>
+        <span className={`absolute inset-0 flex items-center justify-center gap-2 transition-transform duration-300 ${formState === 'success' ? 'translate-y-0' : 'translate-y-10'}`}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4"><polyline points="20 6 9 17 4 12"/></svg>
+          Message Sent!
+        </span>
+      </button>
+    </form>
+  );
+}
+
+// ─── Main Contact Section ─────────────────────────────────────────────────────
+export default function Contact() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const headingRef = useRef<HTMLDivElement>(null);
+  const leftRef = useRef<HTMLDivElement>(null);
+  const rightRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    if (!sectionRef.current) return;
+
+    // Badge
+    const badge = headingRef.current?.querySelector('.contact-badge');
+    if (badge) {
+      gsap.fromTo(badge,
+        { opacity: 0, y: 18, filter: 'blur(8px)' },
+        { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1, ease: 'power3.out',
+          scrollTrigger: { trigger: headingRef.current, start: 'top 88%' } }
+      );
+    }
+
+    // SplitText title char-by-char reveal
+    const h2 = headingRef.current?.querySelector('h2');
+    if (h2) {
+      const split = new SplitType(h2, { types: 'chars' });
+      if (split.chars) {
+        gsap.fromTo(split.chars,
+          { opacity: 0, y: 50, rotateX: -80, filter: 'blur(10px)' },
+          {
+            opacity: 1, y: 0, rotateX: 0, filter: 'blur(0px)',
+            duration: 1.1, stagger: 0.025, ease: 'back.out(1.5)',
+            scrollTrigger: { trigger: headingRef.current, start: 'top 85%', invalidateOnRefresh: true },
+          }
+        );
+      }
+    }
+
+    // Subtitle words
+    const sub = headingRef.current?.querySelector('.contact-sub');
+    if (sub) {
+      const split = new SplitType(sub as HTMLElement, { types: 'words' });
+      if (split.words) {
+        gsap.fromTo(split.words,
+          { opacity: 0, y: 18 },
+          {
+            opacity: 1, y: 0, duration: 0.8, stagger: 0.04, ease: 'power3.out', delay: 0.3,
+            scrollTrigger: { trigger: headingRef.current, start: 'top 82%' },
+          }
+        );
+      }
+    }
+
+    // Left panel slide-in
+    if (leftRef.current) {
+      gsap.fromTo(leftRef.current,
+        { opacity: 0, x: -50, filter: 'blur(6px)' },
+        { opacity: 1, x: 0, filter: 'blur(0px)', duration: 1, ease: 'power3.out',
+          scrollTrigger: { trigger: leftRef.current, start: 'top 82%', invalidateOnRefresh: true } }
+      );
+    }
+
+    // Right form slide-in
+    if (rightRef.current) {
+      gsap.fromTo(rightRef.current,
+        { opacity: 0, x: 50, filter: 'blur(6px)' },
+        { opacity: 1, x: 0, filter: 'blur(0px)', duration: 1, delay: 0.1, ease: 'power3.out',
+          scrollTrigger: { trigger: rightRef.current, start: 'top 82%', invalidateOnRefresh: true } }
+      );
+    }
+
+    // Social cards stagger
+    const cards = gsap.utils.toArray<HTMLElement>('.social-card-item');
+    gsap.fromTo(cards,
+      { opacity: 0, y: 24, scale: 0.96 },
+      {
+        opacity: 1, y: 0, scale: 1,
+        duration: 0.6, stagger: 0.1, ease: 'back.out(1.4)',
+        scrollTrigger: { trigger: leftRef.current, start: 'top 78%', invalidateOnRefresh: true },
+      }
+    );
+  }, { scope: sectionRef });
+
+  return (
+    <section id="contact" ref={sectionRef} className="relative py-32 bg-[#050307] text-[#F5F5F5] overflow-hidden">
+
+      {/* Ambient lighting */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] opacity-[0.06]"
+          style={{ background: 'radial-gradient(ellipse at center top, #C084FC, transparent 70%)' }} />
+        <div className="absolute bottom-0 right-0 w-[600px] h-[400px] opacity-[0.05]"
+          style={{ background: 'radial-gradient(ellipse at bottom right, #FDBA74, transparent 70%)' }} />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[300px] opacity-[0.04]"
+          style={{ background: 'radial-gradient(ellipse at bottom left, #F472B6, transparent 70%)' }} />
+        {/* Floating pollen */}
+        {Array.from({ length: 14 }).map((_, i) => (
+          <div key={i}
+            className="absolute w-1 h-1 rounded-full opacity-20"
+            style={{
+              background: i % 2 === 0 ? '#C084FC' : '#FDBA74',
+              left: `${5 + Math.random() * 90}%`,
+              top: `${5 + Math.random() * 90}%`,
+              animation: `float ${3 + (i % 4)}s ease-in-out ${i * 0.4}s infinite alternate`,
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+
+        {/* Section Heading */}
+        <div ref={headingRef} className="mb-20 text-center flex flex-col items-center gap-5">
+          <div className="contact-badge opacity-0 inline-flex items-center gap-2.5 border border-[#FDBA74]/20 px-4 py-1.5 rounded-full bg-[#120B18]/60 backdrop-blur-md">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FDBA74] animate-pulse" style={{ boxShadow: '0 0 6px #FDBA74' }} />
+            <span className="text-[10px] uppercase tracking-[0.26em] text-[#FDBA74] font-outfit font-medium">Let's Build Something Amazing</span>
           </div>
 
-          <h2 ref={headingRef} className="font-playfair text-4xl sm:text-5xl md:text-7xl font-normal tracking-tight leading-[1.1] text-[#F5F5F5] mb-5">
-            Let's build something{' '}
-            <span className="font-serif italic" style={{ background: 'linear-gradient(135deg,#FDBA74 0%,#F472B6 45%,#C084FC 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              exceptional.
-            </span>
+          <h2 className="font-playfair text-[clamp(36px,5.5vw,80px)] font-normal tracking-tight leading-[1.05] perspective-[800px]">
+            Let's <span className="italic text-[#FDBA74]">Create</span><br />
+            Something Meaningful
           </h2>
 
-          <p ref={subRef} className="font-outfit text-base md:text-lg max-w-lg leading-relaxed" style={{ color: '#7C6B8E' }}>
-            Available for high-impact AI architecture, creative engineering,{' '}
-            <br className="hidden md:block" />and digital systems.
+          <p className="contact-sub font-outfit text-[14px] text-[#A7A7A7] max-w-[600px] text-center leading-[1.8]">
+            Whether it's an AI project, website, collaboration, internship opportunity or simply a conversation — I'm always open to building something meaningful.
           </p>
         </div>
 
-        {/* Two-column */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+        {/* Two-Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start">
 
-          {/* LEFT: Form */}
-          <div ref={formCardRef} className="lg:col-span-7">
-            <div className="relative rounded-[26px] border overflow-hidden"
-              style={{ background: 'rgba(11,6,19,0.88)', borderColor: 'rgba(192,132,252,0.13)', boxShadow: '0 28px 80px rgba(0,0,0,0.95), 0 0 60px rgba(88,28,135,0.09), inset 0 1px 0 rgba(255,255,255,0.04)', backdropFilter: 'blur(30px)' }}>
-              {/* Top shimmer */}
-              <div className="absolute top-0 left-0 right-0 h-[1px] pointer-events-none"
-                style={{ background: 'linear-gradient(90deg,transparent,rgba(192,132,252,0.5),rgba(253,186,116,0.4),transparent)' }} />
-              <div className="absolute inset-0 pointer-events-none"
-                style={{ background: 'radial-gradient(ellipse 80% 35% at 50% 0%,rgba(88,28,135,0.10) 0%,transparent 70%)' }} />
+          {/* Left Panel — Personal Contact Card */}
+          <div ref={leftRef} className="flex flex-col gap-6 opacity-0">
 
-              {/* Success overlay */}
-              {formState === 'success' && (
-                <div className="absolute inset-0 z-[30] flex flex-col items-center justify-center text-center p-10 rounded-[26px]"
-                  style={{ background: 'rgba(8,6,10,0.97)', backdropFilter: 'blur(20px)' }}>
-                  <div className="w-16 h-16 rounded-full flex items-center justify-center mb-5"
-                    style={{ border: '1.5px solid rgba(192,132,252,0.5)', background: 'rgba(192,132,252,0.08)', boxShadow: '0 0 30px rgba(192,132,252,0.25)' }}>
-                    <svg className="w-7 h-7 text-[#C084FC]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M20 6L9 17l-5-5" /></svg>
-                  </div>
-                  <h3 className="font-general text-xl font-bold text-[#F5F5F5] tracking-wider uppercase mb-2">Message Transmitted</h3>
-                  <p className="font-outfit text-sm" style={{ color: '#7C6B8E' }}>I'll respond as soon as I can.</p>
+            {/* Identity card */}
+            <div
+              className="relative rounded-3xl p-7 overflow-hidden"
+              style={{
+                background: 'rgba(18,11,24,0.75)',
+                border: '1px solid rgba(255,255,255,0.07)',
+                backdropFilter: 'blur(28px)',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)',
+              }}
+            >
+              {/* Top border glow */}
+              <div className="absolute top-0 left-8 right-8 h-[1px]"
+                style={{ background: 'linear-gradient(to right, transparent, rgba(192,132,252,0.5), transparent)' }} />
+              {/* Ambient bloom */}
+              <div className="absolute top-0 right-0 w-40 h-40 pointer-events-none"
+                style={{ background: 'radial-gradient(circle at top right, rgba(253,186,116,0.1), transparent 70%)' }} />
+
+              {/* Avatar + Name */}
+              <div className="flex items-center gap-5 mb-6">
+                <div
+                  className="w-16 h-16 rounded-2xl shrink-0 relative overflow-hidden"
+                  style={{
+                    border: '1.5px solid rgba(205,133,63,0.45)',
+                    boxShadow: '0 0 18px rgba(205,133,63,0.3), 0 0 40px rgba(205,133,63,0.12)',
+                    background: '#0a0707',
+                  }}
+                >
+                  <img
+                    src={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/i2flow-logo.jpg`}
+                    alt="i2Flow logo"
+                    className="w-full h-full object-cover"
+                    draggable={false}
+                  />
+                  {/* Subtle inner rim */}
+                  <div className="absolute inset-0 rounded-2xl pointer-events-none"
+                    style={{ boxShadow: 'inset 0 0 12px rgba(0,0,0,0.6)' }} />
                 </div>
-              )}
-
-              <form ref={formRef} onSubmit={handleSubmit} className="relative z-[10] p-8 md:p-12 flex flex-col gap-8">
-                <div className="border-b border-white/[0.07] pb-5">
-                  <div className="text-[10px] font-outfit uppercase tracking-[0.25em] mb-1" style={{ color: '#4A4358' }}>Message Studio</div>
-                  <div className="font-general text-lg font-semibold text-[#F5F5F5]">Send a private message</div>
+                <div>
+                  {/* i2Flow brand name */}
+                  <h3 className="font-playfair text-2xl font-normal leading-tight"
+                    style={{ background: 'linear-gradient(135deg, #CD853F, #E8A94D, #B8730A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                    i²Flow
+                  </h3>
+                  <p className="font-outfit text-[10px] uppercase tracking-[0.26em] mt-0.5"
+                    style={{ color: 'rgba(205,133,63,0.75)' }}>
+                    AI · Design · Engineering
+                  </p>
+                  <p className="font-outfit text-[11px] text-white/35 mt-1.5 leading-relaxed max-w-[180px]">
+                    Building intelligent, cinematic digital experiences
+                  </p>
                 </div>
+              </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                  <FloatInput label="Full Name" placeholder="How should I address you?" />
-                  <FloatInput label="Email Address" type="email" placeholder="Where can I reach you?" />
-                </div>
-                <FloatInput label="Your Message" isTextarea placeholder="Tell me about your vision, project, or idea…" />
+              {/* Animated divider */}
+              <div className="relative h-[1px] mb-6 overflow-hidden rounded-full">
+                <div className="absolute inset-0"
+                  style={{ background: 'linear-gradient(to right, transparent, #C084FC, #FDBA74, #C084FC, transparent)', animation: 'shimmer 3s ease-in-out infinite' }} />
+              </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-white/[0.07] gap-4 flex-wrap">
-                  <p className="text-[10px] font-outfit tracking-wider" style={{ color: '#3A3249' }}>✦ All messages are read personally</p>
-                  <button
-                    ref={btnRef}
-                    type="submit"
-                    disabled={formState !== 'idle'}
-                    onMouseMove={onBtnMove}
-                    onMouseLeave={onBtnLeave}
-                    className="relative overflow-hidden group flex items-center gap-3 px-8 py-3.5 rounded-full font-outfit font-semibold text-sm uppercase tracking-[0.14em] cursor-pointer border-none select-none outline-none"
-                    style={{ background: formState === 'submitting' ? 'rgba(192,132,252,0.2)' : 'linear-gradient(135deg,#581C87 0%,#7C3AED 45%,#C084FC 100%)', color: '#F5F5F5', boxShadow: '0 8px 28px rgba(124,58,237,0.4)', opacity: formState === 'submitting' ? 0.6 : 1, transition: 'opacity 0.3s, box-shadow 0.3s' }}
-                  >
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-full"
-                      style={{ background: 'linear-gradient(135deg,rgba(253,186,116,0.22) 0%,transparent 55%)' }} />
-                    <span className="relative z-[5]">{formState === 'submitting' ? 'Transmitting…' : 'Send Message'}</span>
-                    <span className="relative z-[5] w-6 h-6 rounded-full flex items-center justify-center group-hover:rotate-45 transition-transform duration-300" style={{ background: 'rgba(255,255,255,0.15)' }}>
-                      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                    </span>
-                  </button>
+              {/* Status indicator */}
+              <div className="flex items-center gap-2.5 p-3 rounded-xl mb-2"
+                style={{ background: 'rgba(205,133,63,0.08)', border: '1px solid rgba(205,133,63,0.25)' }}>
+                <span className="w-2 h-2 rounded-full animate-pulse shrink-0" style={{ background: '#CD853F', boxShadow: '0 0 6px #CD853F' }} />
+                <span className="font-outfit text-[11px] font-medium" style={{ color: '#E8A94D' }}>i²Flow — actively building & shipping</span>
+              </div>
+            </div>
+
+            {/* Social Cards */}
+            <div className="flex flex-col gap-3">
+              {SOCIALS.map((social) => (
+                <div key={social.id} className="social-card-item">
+                  <SocialCard social={social} />
                 </div>
-              </form>
+              ))}
             </div>
           </div>
 
-          {/* RIGHT: Link cards */}
-          <div ref={linksColRef} className="lg:col-span-5 flex flex-col gap-2.5">
-            <div className="mb-3 pl-1">
-              <div className="text-[9px] font-outfit uppercase tracking-[0.25em] mb-1" style={{ color: '#4A4358' }}>Find me on</div>
-              <div className="font-general text-lg font-semibold text-[#F5F5F5]">Every corner of the web</div>
-            </div>
-
-            {LINKS.map(link => <LinkCard key={link.id} link={link} />)}
-
-            {/* Availability badge */}
-            <div className="mt-3 p-4 rounded-2xl border flex items-center gap-3 avail"
-              style={{ background: 'rgba(11,6,19,0.75)', borderColor: 'rgba(255,255,255,0.07)', backdropFilter: 'blur(16px)' }}>
-              <div className="relative shrink-0">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#FDBA74] block" style={{ boxShadow: '0 0 8px rgba(253,186,116,0.7)' }} />
-                <span className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-[#FDBA74] animate-ping opacity-40" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xs font-general font-medium text-[#F5F5F5]">Available for new projects</span>
-                <span className="text-[10px] font-outfit tracking-wide" style={{ color: '#4A4358' }}>Typical response within 24h</span>
-              </div>
-            </div>
+          {/* Right Panel — Contact Form */}
+          <div ref={rightRef} className="opacity-0">
+            <ContactForm />
           </div>
         </div>
+
+        {/* Bottom footer line */}
+        <div className="mt-24 flex flex-col items-center gap-4">
+          <div className="h-[1px] w-64"
+            style={{ background: 'linear-gradient(to right, transparent, rgba(192,132,252,0.3), transparent)' }} />
+          <p className="font-outfit text-[10px] uppercase tracking-[0.25em] text-white/20">
+            © {new Date().getFullYear()} K S K Reddy · Crafted with love & code
+          </p>
+        </div>
+
       </div>
 
-      {/* ── Footer ── */}
-      <div ref={footerRef} className="relative z-[10] max-w-7xl mx-auto px-6 mt-20 pt-8 flex flex-col md:flex-row items-center justify-between gap-4"
-        style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <div className="flex items-center gap-2.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#FDBA74] animate-pulse" style={{ boxShadow: '0 0 8px rgba(253,186,116,0.6)' }} />
-          <span className="text-[11px] font-outfit uppercase tracking-[0.22em]" style={{ color: '#4A4358' }}>Hyderabad, India — IST</span>
-        </div>
-        <div className="text-[11px] font-outfit text-center tracking-wider" style={{ color: '#3A3249' }}>
-          © {new Date().getFullYear()} K S K Reddy · i2Flow AI · All rights reserved
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] font-outfit uppercase tracking-[0.22em]" style={{ color: '#4A4358' }}>Crafted with</span>
-          <span className="text-[#FDBA74] text-sm">✦</span>
-          <span className="text-[11px] font-outfit uppercase tracking-[0.22em]"
-            style={{ background: 'linear-gradient(90deg,#C084FC,#FDBA74)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            i2Flow
-          </span>
-        </div>
-      </div>
+      <style>{`
+        @keyframes sweep {
+          from { left: -100%; }
+          to { left: 100%; }
+        }
+        @keyframes expand {
+          from { transform: scaleX(0); transform-origin: left; }
+          to { transform: scaleX(1); transform-origin: left; }
+        }
+        @keyframes shimmer {
+          0%, 100% { transform: translateX(-100%); }
+          50% { transform: translateX(100%); }
+        }
+        @keyframes float {
+          from { transform: translateY(0px) rotate(0deg); }
+          to { transform: translateY(-12px) rotate(12deg); }
+        }
+      `}</style>
     </section>
   );
 }

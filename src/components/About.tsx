@@ -69,15 +69,19 @@ export default function About() {
       }
     }
 
-    // Paragraph
+    // Paragraph Scrub Reveal
     if (paraRef.current) {
-      gsap.fromTo(paraRef.current,
-        { opacity: 0, y: 24 },
-        {
-          opacity: 1, y: 0, duration: 1.0, ...COMMON,
-          scrollTrigger: { trigger: paraRef.current, start: 'top bottom', once: true, invalidateOnRefresh: true }
-        }
-      );
+      const splitPara = new SplitType(paraRef.current, { types: 'lines,words' });
+      gsap.set(paraRef.current, { opacity: 1 }); // container needs to be visible
+      if (splitPara.words) {
+        gsap.fromTo(splitPara.words,
+          { opacity: 0.2 },
+          {
+            opacity: 1, stagger: 0.05, ease: 'none',
+            scrollTrigger: { trigger: paraRef.current, start: 'top 85%', end: 'bottom 60%', scrub: 1, invalidateOnRefresh: true }
+          }
+        );
+      }
     }
 
     // Pills stagger
@@ -123,15 +127,22 @@ export default function About() {
       }
     });
 
-    // Quote
+    // Quote character reveal
     if (quoteRef.current) {
-      gsap.fromTo(quoteRef.current,
-        { opacity: 0, y: 20 },
-        {
-          opacity: 1, y: 0, duration: 1.0, ...COMMON,
-          scrollTrigger: { trigger: quoteRef.current, start: 'top bottom', once: true, invalidateOnRefresh: true }
+      gsap.set(quoteRef.current, { opacity: 1 });
+      const p = quoteRef.current.querySelector('p');
+      if (p) {
+        const splitQuote = new SplitType(p, { types: 'chars' });
+        if (splitQuote.chars) {
+          gsap.fromTo(splitQuote.chars,
+            { opacity: 0, rotateX: -90, y: 20 },
+            {
+              opacity: 1, rotateX: 0, y: 0, duration: 0.8, stagger: 0.02, ease: 'back.out(1.5)',
+              scrollTrigger: { trigger: quoteRef.current, start: 'top 85%', once: true, invalidateOnRefresh: true }
+            }
+          );
         }
-      );
+      }
     }
   }, { scope: containerRef });
 
@@ -178,7 +189,7 @@ export default function About() {
             <div className="absolute bottom-8 left-8 right-8 z-[30]">
               <div className="flex items-center gap-2.5 mb-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#FDBA74] animate-pulse shadow-[0_0_8px_rgba(253,186,116,0.8)]" />
-                <span className="text-2xl font-playfair font-normal group-hover:text-[#FDBA74] transition-colors duration-500">{profile.fullName}</span>
+                <span className="text-2xl font-playfair font-normal group-hover:text-[#FDBA74] transition-colors duration-500">Kata Sai Kranthu Reddy</span>
               </div>
               <div className="text-[#C084FC] text-[11px] font-outfit uppercase tracking-[0.2em]">
                 SRM Institute of Science and Technology • B.Tech AI & ML
@@ -206,7 +217,7 @@ export default function About() {
           </h2>
 
           {/* Paragraph */}
-          <p ref={paraRef} className="text-base md:text-lg text-[#A7A7A7] font-outfit font-light leading-relaxed max-w-2xl" style={{ opacity: 0 }}>
+          <p ref={paraRef} className="text-base md:text-lg text-[#F5F5F5] font-outfit font-light leading-relaxed max-w-2xl opacity-0">
             I'm an AI & Machine Learning student passionate about building intelligent software, immersive web experiences, and products that solve real problems.
           </p>
 

@@ -13,12 +13,9 @@ import Skills from './components/Skills';
 import Timeline from './components/Timeline';
 import Contact from './components/Contact';
 import InteractiveBackground from './components/InteractiveBackground';
-import DeveloperControlCenter from './components/DeveloperControlCenter';
-
 gsap.registerPlugin(ScrollTrigger);
 
 export default function App() {
-  const [isNexusOpen, setIsNexusOpen] = useState(false);
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
@@ -36,27 +33,6 @@ export default function App() {
     if (!lenis) {
       return;
     }
-
-    if (isNexusOpen) {
-      lenis.stop();
-    } else {
-      lenis.start();
-    }
-  }, [isNexusOpen]);
-
-  // SECRET TRIGGER: SHIFT + K (guarded against input elements)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement;
-      const isInput = ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable;
-      if (isInput) return;
-      if (e.shiftKey && e.key.toUpperCase() === 'K') {
-        e.preventDefault();
-        setIsNexusOpen(prev => !prev);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   return (
@@ -74,10 +50,6 @@ export default function App() {
         <Contact />
       </main>
 
-      <DeveloperControlCenter
-        isOpen={isNexusOpen}
-        onClose={() => setIsNexusOpen(false)}
-      />
     </div>
   );
 }

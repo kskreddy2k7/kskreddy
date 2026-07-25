@@ -13,9 +13,11 @@ export type Project = {
   category?: string;
   year?: string;
   stars?: number;
+  forks?: number;
   language?: string;
   keyFeatures?: string[];
   challengesSolved?: string;
+  readmeSummary?: string;
 };
 
 export type SkillCategory = {

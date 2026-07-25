@@ -1,367 +1,472 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import { Project } from '../types';
+import MacOSModal from './MacOSModal';
 import SplitType from 'split-type';
-import { fetchLiveProjects, MergedProject } from '../lib/github';
-import { refreshScrollEngine } from '../lib/scrollEngine';
+import { projects } from '../data';
 
 gsap.registerPlugin(ScrollTrigger);
 
+const CoverImage = ({ repo, language }: { repo: string, language: string }) => {
+  const [extIndex, setExtIndex] = useState(0);
+  const extensions = ['webp', 'png', 'jpg', 'jpeg'];
+  const [failed, setFailed] = useState(false);
+
+  if (failed) {
+    const initials = repo.substring(0, 2).toUpperCase();
+    const color = language === 'TypeScript' ? '#3178C6' : language === 'JavaScript' ? '#F7DF1E' : language === 'Python' ? '#3776AB' : '#C084FC';
+    
+    return (
+      <div className="w-full h-full flex items-center justify-center relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${color}15, #050307)` }}>
+        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\\"0 0 200 200\\" xmlns=\\"http://www.w3.org/2000/svg\\"%3E%3Cfilter id=\\"noiseFilter\\"%3E%3CfeTurbulence type=\\"fractalNoise\\" baseFrequency=\\"0.85\\" numOctaves=\\"3\\" stitchTiles=\\"stitch\\"%3E%3C/feTurbulence%3E%3C/filter%3E%3Crect width=\\"100%25\\" height=\\"100%25\\" filter=\\"url(%23noiseFilter)\\"/%3E%3C/svg%3E")', backgroundSize: '100px 100px' }} />
+        <div className="absolute inset-0 backdrop-blur-3xl" />
+        <span className="relative z-10 font-playfair italic text-6xl text-white/40 tracking-widest">{initials}</span>
+      </div>
+    );
+  }
+
+  return (
+    <img 
+      src={`/projects/${repo}/cover.${extensions[extIndex]}`}
+      alt={repo}
+      className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.19,1,0.22,1)] group-hover:scale-[1.06]"
+      onError={() => {
+        if (extIndex < extensions.length - 1) {
+          setExtIndex(prev => prev + 1);
+        } else {
+          setFailed(true);
+        }
+      }}
+    />
+  );
+};
+
 export default function Projects() {
   const sectionRef = useRef<HTMLElement>(null);
-  const pinWrapRef = useRef<HTMLDivElement>(null);
+  const pinWrapperRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
-  const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
+  
+  // Modal State
+  const [activeProject, setActiveProject] = useState<Project | null>(null);
+  const [windowState, setWindowState] = useState<'closed' | 'open' | 'minimized' | 'fullscreen'>('closed');
+  const [activeView, setActiveView] = useState<'demo' | 'source'>('demo');
+  const [originRect, setOriginRect] = useState<DOMRect | null>(null);
 
-  const [projects, setProjects] = useState<MergedProject[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const openModal = (project: Project, view: 'demo' | 'source', e: React.MouseEvent) => {
+    const card = (e.currentTarget as HTMLElement).closest('.project-card-wrapper');
+    const rect = card ? card.getBoundingClientRect() : (e.currentTarget as HTMLElement).getBoundingClientRect();
+    setOriginRect(rect);
+    setActiveProject(project);
+    setActiveView(view);
+    setWindowState('open');
+    document.body.style.overflow = 'hidden';
+  };
 
-  const [selectedProject, setSelectedProject] = useState<MergedProject | null>(null);
-  const [windowState, setWindowState] = useState<'normal' | 'minimized' | 'fullscreen'>('normal');
-  const [iframeError, setIframeError] = useState(false);
-  const [isIframeLoading, setIsIframeLoading] = useState(true);
+  const closeModal = () => {
+    setWindowState('closed');
+    setTimeout(() => {
+      setActiveProject(null);
+      setOriginRect(null);
+      document.body.style.overflow = 'auto';
+    }, 500);
+  };
 
-  const modalRef = useRef<HTMLDivElement>(null);
-  const modalContentRef = useRef<HTMLDivElement>(null);
-
-  // Fetch live projects
-  useEffect(() => {
-    setIsLoading(true);
-    fetchLiveProjects().then(data => {
-      setProjects(data);
-      setIsLoading(false);
-    });
-  }, []);
-
-  // Build the pinned horizontal scroll ONLY when projects are loaded
   useGSAP(() => {
-    if (isLoading || projects.length === 0 || !trackRef.current || !sectionRef.current || !pinWrapRef.current) return;
+    if (!sectionRef.current || !trackRef.current || !pinWrapperRef.current) return;
 
-    // Kill any previous instance
-    if (scrollTriggerRef.current) {
-      scrollTriggerRef.current.kill();
-      scrollTriggerRef.current = null;
+    // Heading Reveal
+    const h2 = headingRef.current?.querySelector('h2');
+    if (h2) {
+      const split = new SplitType(h2, { types: 'chars' });
+      gsap.fromTo(split.chars, 
+        { opacity: 0, y: 40, filter: 'blur(8px)' },
+        { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.4, stagger: 0.03, ease: 'power3.out', scrollTrigger: { trigger: sectionRef.current, start: 'top 75%' } }
+      );
+      
+      const subtitle = headingRef.current?.querySelector('.subtitle-block');
+      if (subtitle) {
+        gsap.fromTo(subtitle,
+          { opacity: 0, x: -20 },
+          { opacity: 1, x: 0, duration: 1.2, delay: 0.6, ease: 'power2.out', scrollTrigger: { trigger: sectionRef.current, start: 'top 75%' } }
+        );
+      }
     }
 
-    // Wait one frame for DOM to settle
-    const rafId = requestAnimationFrame(() => {
-      const cards = gsap.utils.toArray<HTMLElement>('.proj-card');
-      if (cards.length === 0) return;
-
-      const CARD_W = cards[0].offsetWidth + 32; // width + gap
-      const totalScroll = CARD_W * (cards.length - 1) + 120;
-
-      const st = ScrollTrigger.create({
-        trigger: sectionRef.current,
-        pin: pinWrapRef.current,
-        start: 'top top',
-        end: () => `+=${totalScroll}`,
-        scrub: 1,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => {
-          const x = -self.progress * totalScroll;
-          gsap.set(trackRef.current, { x, force3D: true });
-
-          // Determine active card
-          const viewCenter = window.innerWidth / 2;
-          let closest = 0;
-          let minDist = Infinity;
-          cards.forEach((card, i) => {
-            const rect = card.getBoundingClientRect();
-            const dist = Math.abs(rect.left + rect.width / 2 - viewCenter);
-            if (dist < minDist) { minDist = dist; closest = i; }
-          });
-          setActiveIndex(closest);
+    if (headingRef.current) {
+      const h2 = headingRef.current.querySelector('h2');
+      if (h2 && !h2.querySelector('.word')) {
+        const split = new SplitType(h2, { types: 'words,chars' });
+        if (split.chars) {
+          gsap.fromTo(split.chars,
+            { opacity: 0, y: 50, rotateX: -90 },
+            {
+              opacity: 1, y: 0, rotateX: 0, duration: 1.2, stagger: 0.02, ease: 'power4.out',
+              scrollTrigger: { trigger: headingRef.current, start: 'top 85%' }
+            }
+          );
         }
-      });
+      }
+    }
 
-      scrollTriggerRef.current = st;
-      refreshScrollEngine();
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    if (isMobile) return;
+
+    const cards = gsap.utils.toArray<HTMLElement>('.project-card-wrapper');
+    if (cards.length === 0) return;
+
+    const getTotalScroll = () => {
+      if (!trackRef.current || cards.length === 0) return 0;
+      const cardWidth = cards[0].offsetWidth;
+      const trackStyle = window.getComputedStyle(trackRef.current);
+      const gap = parseFloat(trackStyle.gap) || 0;
+      return (cards.length - 1) * (cardWidth + gap);
+    };
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        pin: pinWrapperRef.current,
+        scrub: 1,
+        start: 'top top',
+        end: () => `+=${getTotalScroll() * 1.6}`, // Cinematic pacing
+        invalidateOnRefresh: true,
+      }
+    });
+
+    tl.to(trackRef.current, {
+      x: () => -getTotalScroll(),
+      ease: 'none',
+      onUpdate: function() {
+        const screenCenter = window.innerWidth / 2;
+        
+        cards.forEach((card, i) => {
+          const rect = card.getBoundingClientRect();
+          const cardCenter = rect.left + rect.width / 2;
+          const dist = Math.abs(cardCenter - screenCenter);
+          
+          let scale, y, opacity, blur;
+          if (dist < 400) {
+            // Active (0) to Neighbor (400)
+            const progress = 1 - (dist / 400); // 1 = Active, 0 = Neighbor
+            scale = 0.92 + (0.10 * progress);
+            y = 25 - (37 * progress); // 25 -> -12
+            opacity = 0.75 + (0.25 * progress);
+            blur = 2 - (2 * progress); // 2 -> 0
+          } else {
+            // Neighbor (400) to Far (800+)
+            const progress = Math.max(0, 1 - ((dist - 400) / 400)); // 1 = Neighbor, 0 = Far
+            scale = 0.85 + (0.07 * progress);
+            y = 60 - (35 * progress); // 60 -> 25
+            opacity = 0.40 + (0.35 * progress);
+            blur = 6 - (4 * progress); // 6 -> 2
+          }
+
+          const z = -120 + (120 * (dist < 400 ? (1 - dist/400) : 0));
+          const brightness = dist < 400 ? 1 + (0.08 * (1 - dist/400)) : 1; 
+
+          // RotateY (true Cover Flow)
+          const delta = cardCenter - screenCenter;
+          const sign = delta > 0 ? -1 : 1;
+          const rotNorm = Math.min(1, Math.abs(delta) / 600);
+          const rotationY = sign * rotNorm * 25; // max 25deg rotation
+          
+          gsap.set(card, {
+            scale,
+            y,
+            z,
+            rotationY,
+            transformPerspective: 1200,
+            opacity,
+            filter: `blur(${blur}px) brightness(${brightness})`
+          });
+
+          // Cinematic Ambient Glow (Steady, no flashing)
+          const glowContainer = card.querySelector('.active-glow-container');
+          if (glowContainer) {
+             const glowOpacity = dist < 300 ? Math.pow(1 - dist/300, 2) : 0;
+             gsap.set(glowContainer, { opacity: glowOpacity });
+          }
+
+          // Active Highlights (Border / Dot)
+          const activeBorder = card.querySelector('.active-border');
+          const activeDot = card.querySelector('.active-dot');
+          const glowIntensity = Math.pow(Math.max(0, 1 - dist/300), 3);
+          if (activeBorder) gsap.set(activeBorder, { opacity: glowIntensity });
+          if (activeDot) gsap.set(activeDot, { opacity: glowIntensity });
+
+          // Spotlight Glow matching active card
+          const glow = card.querySelector('.active-glow');
+          if (glow) {
+            const normalized = 1 - (dist / 800);
+            const easeNorm = Math.max(0, (normalized - 0.7) * 3.33); 
+            gsap.set(glow, { opacity: easeNorm });
+          }
+        });
+      }
     });
 
     return () => {
-      cancelAnimationFrame(rafId);
-      scrollTriggerRef.current?.kill();
-      scrollTriggerRef.current = null;
+      tl.kill();
     };
+  }, { scope: sectionRef });
 
-  }, { scope: sectionRef, dependencies: [projects, isLoading] });
+  const handleCardMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    const inner = card.querySelector('.card-inner');
+    if (!inner) return;
 
-  // Heading reveal — runs ONCE after mount, guarded by a ref flag
-  useGSAP(() => {
-    if (!headingRef.current) return;
-    const h2 = headingRef.current.querySelector('h2');
-    if (!h2) return;
-    // Guard: only split if not already split
-    if (h2.querySelector('.word')) return;
-    const split = new SplitType(h2, { types: 'words' });
-    if (split.words) {
-      gsap.fromTo(split.words,
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1, y: 0, duration: 1.0, stagger: 0.04, ease: 'power4.out',
-          scrollTrigger: { trigger: headingRef.current, start: 'top 85%', invalidateOnRefresh: true }
-        }
-      );
-    }
-  }, { scope: sectionRef, dependencies: [] });
-
-  // Modal management
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && selectedProject) closeModal();
-    };
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, [selectedProject]);
-
-  useEffect(() => {
-    if (selectedProject && windowState !== 'minimized') {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
-  }, [selectedProject, windowState]);
-
-  const openModal = useCallback((project: MergedProject) => {
-    setSelectedProject(project);
-    setWindowState('normal');
-    setIframeError(false);
-    setIsIframeLoading(true);
-  }, []);
-
-  const closeModal = useCallback(() => {
-    if (modalContentRef.current) {
-      gsap.to(modalContentRef.current, {
-        scale: 0.88, opacity: 0, y: 30, duration: 0.3, ease: 'power2.in',
-        onComplete: () => {
-          setSelectedProject(null);
-          setWindowState('normal');
-        }
+    const moveHandler = (ev: MouseEvent) => {
+      const rect = card.getBoundingClientRect();
+      const x = ev.clientX - rect.left - rect.width / 2;
+      const y = ev.clientY - rect.top - rect.height / 2;
+      
+      gsap.to(inner, {
+        rotationY: (x / rect.width) * 12,
+        rotationX: -(y / rect.height) * 12,
+        transformPerspective: 1200,
+        ease: 'power2.out',
+        duration: 0.6
       });
-    } else {
-      setSelectedProject(null);
-    }
-  }, []);
+      
+      const reflection = card.querySelector('.glass-reflection');
+      if (reflection) {
+        gsap.to(reflection, {
+          x: (x / rect.width) * 100,
+          y: (y / rect.height) * 100,
+          opacity: 0.8,
+          ease: 'power2.out',
+          duration: 0.6
+        });
+      }
+    };
+    
+    card.addEventListener('mousemove', moveHandler);
+    card.addEventListener('mouseleave', () => {
+      card.removeEventListener('mousemove', moveHandler);
+      gsap.to(inner, { rotationY: 0, rotationX: 0, ease: 'power3.out', duration: 1.2 });
+      
+      const reflection = card.querySelector('.glass-reflection');
+      if (reflection) {
+        gsap.to(reflection, { x: 0, y: 0, opacity: 0, ease: 'power3.out', duration: 1.2 });
+      }
+    }, { once: true });
+    
+    window.dispatchEvent(new CustomEvent('set-cursor-mode', { detail: { mode: 'explore' } }));
+  };
 
-  const rotations = [-2.2, 2, -1.8, 2.2, -2, 1.8, -1.5, 2.5];
+  const handleCardMouseLeave = () => {
+    window.dispatchEvent(new CustomEvent('set-cursor-mode', { detail: { mode: 'default' } }));
+  };
+
+
 
   return (
-    <section
-      id="projects"
-      ref={sectionRef}
-      className="relative text-[#F5F5F5] z-[10]"
-      style={{ background: '#08060A' }}
-    >
-      {/* Background Texture */}
-      <div className="absolute inset-0 bg-[#08060A] z-0" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(88,28,135,0.10)_0%,_transparent_65%)] pointer-events-none z-[1]" />
-      <div className="absolute inset-0 bg-[radial-gradient(#C084FC_1px,_transparent_1px)] [background-size:40px_40px] opacity-[0.07] pointer-events-none z-[1]" />
+    <section id="projects" ref={sectionRef} className="relative bg-[#08060A] min-h-[200vh] text-[#F5F5F5] overflow-hidden pb-48 selection:bg-[#C084FC]/30">
+      
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(192,132,252,0.02)_0%,_transparent_60%)] pointer-events-none" />
+      <div className="absolute inset-0 opacity-[0.012] pointer-events-none mix-blend-screen" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\\"0 0 200 200\\" xmlns=\\"http://www.w3.org/2000/svg\\"%3E%3Cfilter id=\\"noiseFilter\\"%3E%3CfeTurbulence type=\\"fractalNoise\\" baseFrequency=\\"0.95\\" numOctaves=\\"3\\" stitchTiles=\\"stitch\\"%3E%3C/feTurbulence%3E%3C/filter%3E%3Crect width=\\"100%25\\" height=\\"100%25\\" filter=\\"url(%23noiseFilter)\\"/%3E%3C/svg%3E")', backgroundSize: '100px 100px' }} />
 
-      {/* Pin Wrapper — solid bg so sections below don't bleed through during GSAP pin */}
-      <div ref={pinWrapRef} className="h-screen w-full overflow-hidden flex flex-col justify-between pt-16 pb-6 relative z-[2]" style={{ background: '#08060A' }}>
-
-        {/* Section Header */}
-        <div ref={headingRef} className="max-w-7xl mx-auto px-6 w-full flex flex-col md:flex-row justify-between items-start md:items-end gap-3 relative z-[10]">
-          <div>
-            <div className="inline-flex items-center gap-2 border border-[#C084FC]/20 px-3.5 py-1 rounded-full bg-[#2D122D]/40 mb-3 backdrop-blur-md">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#FDBA74] animate-pulse" />
-              <span className="text-[10px] uppercase tracking-[0.22em] text-[#C084FC] font-outfit font-medium">GITHUB LIVE SYNC</span>
-            </div>
-            <h2 className="font-playfair text-2xl sm:text-4xl md:text-5xl font-normal tracking-tight leading-[1.1] text-[#F5F5F5]">
-              FEATURED <span className="font-serif italic text-[#FDBA74]">REPOSITORIES</span>
-            </h2>
+      <div className="absolute inset-0 pointer-events-none overflow-hidden hidden md:block">
+        {[...Array(6)].map((_, i) => (
+          <div 
+            key={i} 
+            className="absolute rounded-full bg-[#C084FC] opacity-[0.03] blur-sm animate-float-slow"
+            style={{
+              width: `${Math.random() * 4 + 2}px`,
+              height: `${Math.random() * 4 + 2}px`,
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * -10}s`,
+              animationDuration: `${Math.random() * 10 + 15}s`
+            }}
+          />
+        ))}
+      </div>
+      
+      <div ref={pinWrapperRef} className="h-[100svh] w-full relative flex flex-col justify-center perspective-[1200px] overflow-hidden py-[4svh]">
+        
+        <div ref={headingRef} className="shrink-0 flex flex-col items-center text-center px-[clamp(40px,6vw,100px)] max-w-[1600px] w-full mx-auto relative">
+          <div className="absolute top-2 right-[clamp(40px,6vw,100px)] items-center gap-2 text-[#A7A7A7] text-[10px] uppercase tracking-widest font-outfit hidden md:flex opacity-60">
+             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="5" y="2" width="14" height="20" rx="7"/><path d="M12 6v4"/></svg>
+             <span>Scroll to explore</span>
           </div>
-          <div className="text-[10px] font-mono text-[#C084FC] uppercase tracking-widest hidden md:block">
-            {activeIndex + 1} / {projects.length} • Drag or scroll →
+          
+          <h2 className="font-playfair font-normal tracking-tight flex flex-row items-center gap-3 md:gap-4 leading-[0.85] perspective-[1000px]">
+            <span className="text-[clamp(48px,7vw,96px)]">SELECTED</span>
+            <span className="text-[clamp(48px,7vw,96px)] italic text-[#C084FC]">WORKS</span>
+          </h2>
+          
+          <div className="subtitle-block flex items-center justify-center mt-6 px-4">
+            <p className="text-[13px] md:text-[15px] font-outfit text-[#A7A7A7] font-light max-w-2xl text-center leading-relaxed">
+              Dynamically generated from {projects.length} unique digital experiences discovered across my pinned repositories.
+            </p>
           </div>
         </div>
 
-        {/* Horizontal Track */}
-        <div className="relative w-full overflow-visible my-auto py-4 z-[10]">
-          {isLoading ? (
-            <div className="flex items-center justify-center h-[55vh] gap-3 text-xs font-outfit text-[#A7A7A7] uppercase tracking-widest">
-              <div className="w-5 h-5 border-2 border-[#C084FC] border-t-transparent rounded-full animate-spin" />
-              Fetching Repositories...
-            </div>
-          ) : (
-            <div
-              ref={trackRef}
-              className="flex items-center gap-8 px-16 w-max will-change-transform"
-              style={{ transform: 'translateX(0px)' }}
-            >
-              {projects.map((project, idx) => {
-                const isActive = idx === activeIndex;
-                const rot = isActive ? 0 : rotations[idx % rotations.length];
-                return (
-                  <div
-                    key={project.id}
-                    onClick={() => openModal(project)}
-                    className={`proj-card relative group w-[340px] md:w-[400px] h-[55vh] max-h-[460px] rounded-2xl border p-5 flex flex-col justify-between cursor-pointer bg-[#120B18]/70 backdrop-blur-xl will-change-transform transition-all duration-400 ease-out`}
-                    style={{
-                      transform: `rotateZ(${rot}deg) scale(${isActive ? 1.04 : 0.94})`,
-                      opacity: isActive ? 1 : 0.5,
-                      borderColor: isActive ? 'rgba(192,132,252,0.6)' : 'rgba(255,255,255,0.08)',
-                      boxShadow: isActive ? '0 20px 60px rgba(0,0,0,0.9), 0 0 40px rgba(192,132,252,0.12)' : '0 8px 30px rgba(0,0,0,0.6)',
-                    }}
-                  >
-                    {/* Top metadata */}
-                    <div className="flex justify-between items-center z-[10]">
-                      {project.category && (
-                        <div className="flex items-center gap-1.5">
-                          <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[#FDBA74] animate-pulse' : 'bg-white/30'}`} />
-                          <span className={`text-[10px] font-outfit uppercase tracking-[0.18em] ${isActive ? 'text-[#FDBA74]' : 'text-[#A7A7A7]'}`}>
-                            {project.category}
-                          </span>
-                        </div>
-                      )}
-                      {project.updated_date_formatted && (
-                        <span className="text-[9px] font-outfit uppercase tracking-[0.15em] text-[#A7A7A7] border border-white/10 px-2 py-0.5 rounded-full">
-                          {project.updated_date_formatted}
-                        </span>
-                      )}
-                    </div>
+        <div className="h-[clamp(40px,6vh,80px)] shrink-0" />
 
-                    {/* Cover image */}
-                    <div className="relative w-full h-[52%] rounded-xl overflow-hidden border border-white/10 bg-black/40 z-[10]">
-                      <img
-                        src={project.cover_image}
-                        alt={project.title}
-                        className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 ease-out"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#08060A] via-transparent to-transparent opacity-80" />
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <span className="px-4 py-2 rounded-full bg-[#C084FC] text-[#08060A] font-outfit text-xs font-bold uppercase tracking-wider">
-                          Launch ↗
-                        </span>
+        <div className="relative w-full h-[clamp(450px,65svh,760px)] shrink-0">
+          <div 
+            ref={trackRef} 
+            className="absolute left-0 flex h-full items-center will-change-transform"
+            style={{ 
+              gap: 'clamp(24px, 4vw, 56px)',
+              paddingLeft: 'calc(50vw - clamp(140px, 20vw, 230px))', 
+              paddingRight: 'calc(50vw - clamp(140px, 20vw, 230px))'
+            }}
+          >
+            {projects.map((project, i) => (
+              <div 
+                key={project.id} 
+                className="project-card-wrapper shrink-0 relative cursor-none group will-change-transform"
+                style={{ width: 'clamp(320px, 45svh, 520px)', height: 'clamp(450px, 65svh, 760px)', opacity: 0.6, transform: 'scale(0.90)' }}
+                onMouseEnter={handleCardMouseEnter}
+                onMouseLeave={handleCardMouseLeave}
+              >
+                <div className="active-glow absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[160%] h-[140%] pointer-events-none mix-blend-screen opacity-0 transition-opacity duration-1000">
+                   <div className="w-full h-full bg-[radial-gradient(ellipse_at_center,_rgba(192,132,252,0.12)_0%,_transparent_65%)] animate-breathe" />
+                </div>
+                
+                <div className="w-full h-full animate-float-card group-hover:-translate-y-[6px] transition-transform duration-700 ease-[cubic-bezier(0.19,1,0.22,1)]" style={{ animationDelay: `${i * -1.5}s` }}>
+                  
+                  {/* Steady Background Glow */}
+                  <div className="absolute inset-[-40px] pointer-events-none opacity-0 active-glow-container -z-10" style={{ transform: 'translateZ(-10px)' }}>
+                     <div className="absolute inset-[-80px] bg-[#C084FC] opacity-[0.25] blur-[120px] rounded-full" />
+                     <div className="absolute inset-[0px] bg-[#C084FC] opacity-[0.15] blur-[60px] rounded-full" />
+                  </div>
+
+                  <div className="card-inner relative w-full h-full rounded-[28px] overflow-hidden bg-[#0A070E] border border-white/[0.08] hover:border-t-white/30 hover:border-l-white/20 transition-all duration-700 flex flex-col group/glass z-10">
+                     {/* Clean, intense neon border glow pushing OUTWARD only */}
+                     <div className="active-border absolute inset-0 rounded-[28px] pointer-events-none opacity-0 z-20" style={{ boxShadow: '0 0 100px rgba(192, 132, 252, 0.8), 0 0 40px rgba(192, 132, 252, 0.6), 0 0 0 2px rgba(192, 132, 252, 1)' }} />
+                     <div className="active-dot absolute top-5 right-5 w-2.5 h-2.5 rounded-full bg-[#C084FC] shadow-[0_0_12px_#C084FC] opacity-0 transition-opacity duration-300 z-30" />
+
+                    <div className="w-full aspect-[16/10] relative overflow-hidden shrink-0 group-hover/glass:brightness-110 transition-all duration-700">
+                      {/* Subtler gradient, only blending the very bottom edge */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0A070E] via-[#0A070E]/5 to-transparent z-10" />
+                      {/* Cinematic Vignette */}
+                      <div className="absolute inset-0 shadow-[inset_0_0_80px_rgba(0,0,0,0.5)] z-10 pointer-events-none" />
+                      {/* Reduced noise to stop washing out the image */}
+                      <div className="absolute inset-0 opacity-[0.15] mix-blend-overlay z-10" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\\"0 0 200 200\\" xmlns=\\"http://www.w3.org/2000/svg\\"%3E%3Cfilter id=\\"noiseFilter\\"%3E%3CfeTurbulence type=\\"fractalNoise\\" baseFrequency=\\"0.85\\" numOctaves=\\"3\\" stitchTiles=\\"stitch\\"%3E%3C/feTurbulence%3E%3C/filter%3E%3Crect width=\\"100%25\\" height=\\"100%25\\" filter=\\"url(%23noiseFilter)\\"/%3E%3C/svg%3E")' }} />
+                      
+                      <div className="w-full h-full scale-[1.02]">
+                         <CoverImage repo={project.title} language={project.language || 'TypeScript'} />
+                      </div>
+                      
+                      <div className="glass-reflection absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.08] to-transparent opacity-0 pointer-events-none transition-opacity duration-700 z-20" />
+                    </div>
+                    
+                    <div className="p-[clamp(16px,2vh,32px)] flex flex-col flex-1 relative bg-[#0A070E] z-10">
+                      <div className="flex gap-2 mb-4 flex-wrap relative z-10">
+                        {project.technologies?.slice(0, 3).map(t => (
+                          <span key={t} className="text-[7.5px] md:text-[8.5px] font-outfit font-medium uppercase tracking-[0.15em] text-[#A7A7A7] border border-white/5 bg-white/[0.02] px-3.5 py-1.5 rounded-full backdrop-blur-md">
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                      
+                      <h3 className="text-[clamp(18px,2.5vh,28px)] font-playfair text-[#F5F5F5] mb-2 tracking-tight leading-tight line-clamp-2 relative z-10 font-normal">
+                        -{project.title.replace(/\s+/g, '-')}
+                      </h3>
+                      <p className="text-[clamp(11px,1.5vh,13px)] font-outfit text-[#A7A7A7] line-clamp-3 leading-relaxed mb-4 font-light relative z-10">
+                        {project.overview}
+                      </p>
+                      
+                      <div className="mt-auto flex gap-4 w-full relative z-[9999] pt-2 pb-2">
+                        <button 
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); openModal(project, 'demo', e); }}
+                          className="flex-1 h-[48px] bg-gradient-to-r from-[#C084FC] to-[#9333EA] text-white font-outfit text-[11px] font-bold tracking-[0.15em] uppercase rounded-full flex items-center justify-center gap-2.5 transition-all duration-500 hover:scale-[1.02] shadow-[0_0_20px_rgba(192,132,252,0.4)] hover:shadow-[0_0_30px_rgba(192,132,252,0.7)] group relative overflow-hidden pointer-events-auto cursor-pointer"
+                        >
+                          {/* Shine effect */}
+                          <div className="absolute inset-0 w-[50%] -translate-x-[200%] bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:animate-[shine_1s_ease-in-out_forwards] skew-x-[-20deg]" />
+                          <span className="relative z-10">View Live Demo</span>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="relative z-10 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+                        </button>
+                        <button 
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); openModal(project, 'source', e); }}
+                          className="flex-1 h-[48px] bg-[#0A070E]/80 backdrop-blur-md text-[#C084FC] font-outfit text-[11px] font-bold tracking-[0.15em] uppercase rounded-full flex items-center justify-center gap-2.5 transition-all duration-500 border border-[#C084FC]/30 hover:border-[#C084FC] hover:bg-[#C084FC]/10 hover:scale-[1.02] group relative overflow-hidden pointer-events-auto cursor-pointer"
+                        >
+                          {/* Subtle inner glow on hover */}
+                          <div className="absolute inset-0 bg-[#C084FC] opacity-0 group-hover:opacity-10 transition-opacity duration-500" />
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" className="relative z-10 group-hover:scale-110 transition-transform duration-300"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                          <span className="relative z-10">Source Code</span>
+                        </button>
                       </div>
                     </div>
-
-                    {/* Text content */}
-                    <div className="flex flex-col z-[10]">
-                      <h3 className={`font-general text-lg font-bold mb-1 truncate transition-colors ${isActive ? 'text-[#F5F5F5]' : 'text-[#A7A7A7]'}`}>
-                        {project.title}
-                      </h3>
-                      {project.description && (
-                        <p className="font-outfit text-xs text-[#A7A7A7] line-clamp-2 leading-relaxed mb-3">
-                          {project.description}
-                        </p>
-                      )}
-                      {project.tech_stack?.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5">
-                          {project.tech_stack.slice(0, 4).map(tech => (
-                            <span key={tech} className="px-2 py-0.5 border border-[#C084FC]/20 rounded-full text-[8.5px] font-outfit uppercase tracking-wider text-[#A7A7A7] bg-[#2D122D]/30">
-                              {tech}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Bottom instruction */}
-        <div className="max-w-7xl mx-auto px-6 w-full flex justify-between items-center text-[10px] font-outfit text-[#A7A7A7] uppercase tracking-[0.2em] relative z-[10]">
-          <span>SCROLL TO EXPLORE</span>
-          <span>CLICK CARD TO PREVIEW ↗</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
+      
 
-      {/* Project Window Modal */}
-      {selectedProject && windowState !== 'minimized' && (
-        <div ref={modalRef} className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/85 backdrop-blur-2xl">
-          <div
-            ref={modalContentRef}
-            className={`relative flex flex-col bg-[#0D0B10]/95 border border-[#C084FC]/20 rounded-[20px] overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.95)] transition-all duration-400 ${
-              windowState === 'fullscreen' ? 'w-full h-full rounded-none border-none' : 'w-[88vw] h-[88vh] max-w-[1400px]'
-            }`}
-          >
-            {/* Title Bar */}
-            <div className="h-12 bg-[#16101D]/90 border-b border-white/10 px-5 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2">
-                <button onClick={closeModal} className="w-3.5 h-3.5 rounded-full bg-[#FF5F56] border border-[#E0443E] group cursor-pointer hover:scale-110 transition-transform flex items-center justify-center">
-                  <span className="opacity-0 group-hover:opacity-100 text-[8px] text-black font-bold">✕</span>
-                </button>
-                <button
-                  onClick={() => setWindowState('minimized')}
-                  className="w-3.5 h-3.5 rounded-full bg-[#FFBD2E] border border-[#DEA123] group cursor-pointer hover:scale-110 transition-transform flex items-center justify-center"
-                >
-                  <span className="opacity-0 group-hover:opacity-100 text-[8px] text-black font-bold">−</span>
-                </button>
-                <button
-                  onClick={() => setWindowState(prev => prev === 'fullscreen' ? 'normal' : 'fullscreen')}
-                  className="w-3.5 h-3.5 rounded-full bg-[#F472B6] border border-[#C084FC] group cursor-pointer hover:scale-110 transition-transform flex items-center justify-center"
-                >
-                  <span className="opacity-0 group-hover:opacity-100 text-[7px] text-black font-bold">⤢</span>
-                </button>
+
+      {/* Floating Dock for Minimized Window */}
+      {windowState === 'minimized' && activeProject && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[110] flex items-end justify-center animate-in slide-in-from-bottom-10 fade-in duration-500">
+          <div className="bg-[#1c1c1e]/80 backdrop-blur-3xl border border-white/10 rounded-2xl p-2 shadow-2xl flex items-center gap-2">
+            <button 
+              onClick={() => setWindowState('open')}
+              className="w-16 h-16 rounded-xl overflow-hidden relative group transition-transform hover:-translate-y-2 hover:scale-110 active:scale-95 shadow-lg border border-white/10 bg-[#0A070E]"
+            >
+              <div className="absolute inset-0 bg-[#C084FC]/20 group-hover:bg-[#C084FC]/40 transition-colors z-10" />
+              <img src={`/projects/${activeProject.title}/cover.webp`} alt="App Icon" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
+              <div className="absolute inset-x-0 bottom-1 flex justify-center z-20">
+                <div className="w-1 h-1 bg-white/80 rounded-full shadow-[0_0_4px_white]" />
               </div>
-
-              <div className="flex items-center gap-2 bg-[#08060A]/80 border border-white/10 rounded-lg px-4 py-1 max-w-[400px] w-full mx-4 text-xs font-mono text-[#A7A7A7] truncate">
-                <span className="text-[#C084FC]">🔒</span>
-                <span className="truncate">{selectedProject.demo_url}</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <a href={selectedProject.demo_url} target="_blank" rel="noreferrer" className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C084FC] text-[#08060A] font-outfit text-xs font-bold uppercase tracking-wider hover:bg-white transition-colors">
-                  Live ↗
-                </a>
-                <a href={selectedProject.github_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-white font-outfit text-xs hover:bg-white/20 transition-colors">
-                  GitHub ↗
-                </a>
-              </div>
-            </div>
-
-            {/* iFrame Content */}
-            <div className="relative flex-1 w-full bg-[#08060A] overflow-hidden">
-              {isIframeLoading && !iframeError && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0D0B10] gap-3 z-[10]">
-                  <div className="w-8 h-8 border-2 border-[#C084FC] border-t-transparent rounded-full animate-spin" />
-                  <span className="font-outfit text-xs text-[#A7A7A7] tracking-widest uppercase">Loading Preview...</span>
-                </div>
-              )}
-              {iframeError ? (
-                <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-                  <div className="text-2xl mb-4">🌐</div>
-                  <h3 className="text-lg font-bold text-white mb-2">Preview Restricted</h3>
-                  <p className="text-sm text-[#A7A7A7] max-w-md mb-6">This site blocks iframe embedding. Open directly in a new tab.</p>
-                  <a href={selectedProject.demo_url} target="_blank" rel="noreferrer" className="px-6 py-2.5 rounded-full bg-[#C084FC] text-black font-bold text-xs uppercase tracking-wider">
-                    Open Live Demo ↗
-                  </a>
-                </div>
-              ) : (
-                <iframe
-                  src={selectedProject.demo_url}
-                  title={selectedProject.title}
-                  onLoad={() => setIsIframeLoading(false)}
-                  onError={() => { setIsIframeLoading(false); setIframeError(true); }}
-                  className="w-full h-full border-none"
-                />
-              )}
-            </div>
+            </button>
           </div>
         </div>
       )}
 
-      {/* Minimized Dock */}
-      {selectedProject && windowState === 'minimized' && (
-        <div onClick={() => setWindowState('normal')} className="fixed bottom-6 right-6 z-[300] bg-[#120B18]/90 border border-[#C084FC]/30 p-3 rounded-2xl backdrop-blur-2xl flex items-center gap-3 cursor-pointer hover:scale-105 transition-transform shadow-2xl">
-          <img src={selectedProject.cover_image} alt={selectedProject.title} className="w-8 h-8 rounded-lg object-cover border border-white/20" />
-          <div className="flex flex-col">
-            <span className="text-xs font-bold text-white">{selectedProject.title}</span>
-            <span className="text-[9px] text-[#FDBA74]">Click to restore</span>
-          </div>
-        </div>
+      {/* MacOS Window Component */}
+      {activeProject && (
+        <MacOSModal 
+          project={activeProject}
+          activeView={activeView}
+          windowState={windowState}
+          setWindowState={setWindowState}
+          originRect={originRect}
+          onClose={closeModal}
+        />
       )}
+
+      {/* Global styles for animations & scrollbar */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes shine {
+          0% { transform: translateX(-200%) skewX(-20deg); }
+          100% { transform: translateX(300%) skewX(-20deg); }
+        }
+        @keyframes breathe {
+          0%, 100% { opacity: 0.2; transform: scale(0.95); }
+          50% { opacity: 1; transform: scale(1.05); }
+        }
+        .animate-breathe {
+          animation: breathe 5s ease-in-out infinite;
+        }
+        @keyframes float-card {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
+        .animate-float-card {
+          animation: float-card 7s ease-in-out infinite;
+        }
+        @keyframes float-slow {
+          0%, 100% { transform: translate(0, 0); }
+          50% { transform: translate(15px, -15px); }
+        }
+        .animate-float-slow {
+          animation: float-slow infinite ease-in-out;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+      `}} />
     </section>
   );
 }
