@@ -26,9 +26,20 @@ function detachScrollEngineListeners() {
   }
 }
 
-export function initScrollEngine(): Lenis {
+export function initScrollEngine(): Lenis | null {
   if (lenisInstance) {
     return lenisInstance;
+  }
+
+  // Disable Lenis smooth scroll on mobile & touch devices to ensure ultra-smooth native scroll
+  const isMobile = typeof window !== 'undefined' && (
+    window.innerWidth <= 1024 ||
+    'ontouchstart' in window ||
+    navigator.maxTouchPoints > 0
+  );
+
+  if (isMobile) {
+    return null;
   }
 
   const lenis = new Lenis({
