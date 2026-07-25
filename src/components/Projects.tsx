@@ -29,7 +29,7 @@ const CoverImage = ({ repo, language }: { repo: string, language: string }) => {
 
   return (
     <img 
-      src={`/projects/${repo}/cover.${extensions[extIndex]}`}
+      src={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/projects/${repo}/cover.${extensions[extIndex]}`}
       alt={repo}
       className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.19,1,0.22,1)] group-hover:scale-[1.06]"
       onError={() => {
