@@ -49,6 +49,17 @@ export default function Projects() {
   const trackRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
   
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   // Modal State
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [windowState, setWindowState] = useState<'closed' | 'open' | 'minimized' | 'fullscreen'>('closed');
@@ -264,11 +275,15 @@ export default function Projects() {
 
 
   return (
-    <section id="projects" ref={sectionRef} className="relative bg-[#08060A] min-h-[200vh] text-[#F5F5F5] overflow-hidden pb-48 selection:bg-[#C084FC]/30">
+    <section 
+      id="projects" 
+      ref={sectionRef} 
+      className={`relative bg-[#08060A] ${isMobile ? 'min-h-fit pb-20' : 'min-h-[200vh] pb-48'} text-[#F5F5F5] overflow-hidden selection:bg-[#C084FC]/30`}
+    >
       
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(192,132,252,0.02)_0%,_transparent_60%)] pointer-events-none" />
       <div className="absolute inset-0 opacity-[0.012] pointer-events-none mix-blend-screen" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\\"0 0 200 200\\" xmlns=\\"http://www.w3.org/2000/svg\\"%3E%3Cfilter id=\\"noiseFilter\\"%3E%3CfeTurbulence type=\\"fractalNoise\\" baseFrequency=\\"0.95\\" numOctaves=\\"3\\" stitchTiles=\\"stitch\\"%3E%3C/feTurbulence%3E%3C/filter%3E%3Crect width=\\"100%25\\" height=\\"100%25\\" filter=\\"url(%23noiseFilter)\\"/%3E%3C/svg%3E")', backgroundSize: '100px 100px' }} />
-
+ 
       <div className="absolute inset-0 pointer-events-none overflow-hidden hidden md:block">
         {[...Array(6)].map((_, i) => (
           <div 
@@ -286,17 +301,20 @@ export default function Projects() {
         ))}
       </div>
       
-      <div ref={pinWrapperRef} className="h-[100svh] w-full relative flex flex-col justify-center perspective-[1200px] overflow-hidden py-[4svh]">
+      <div 
+        ref={pinWrapperRef} 
+        className={`${isMobile ? 'h-auto py-12 overflow-visible' : 'h-[100svh] py-[4svh] overflow-hidden'} w-full relative flex flex-col justify-center perspective-[1200px]`}
+      >
         
-        <div ref={headingRef} className="shrink-0 flex flex-col items-center text-center px-[clamp(40px,6vw,100px)] max-w-[1600px] w-full mx-auto relative">
+        <div ref={headingRef} className="shrink-0 flex flex-col items-center text-center px-[clamp(20px,6vw,100px)] max-w-[1600px] w-full mx-auto relative">
           <div className="absolute top-2 right-[clamp(40px,6vw,100px)] items-center gap-2 text-[#A7A7A7] text-[10px] uppercase tracking-widest font-outfit hidden md:flex opacity-60">
              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="5" y="2" width="14" height="20" rx="7"/><path d="M12 6v4"/></svg>
              <span>Scroll to explore</span>
           </div>
           
-          <h2 className="font-playfair font-normal tracking-tight flex flex-row items-center gap-3 md:gap-4 leading-[0.85] perspective-[1000px]">
-            <span className="text-[clamp(48px,7vw,96px)]">SELECTED</span>
-            <span className="text-[clamp(48px,7vw,96px)] italic text-[#C084FC]">WORKS</span>
+          <h2 className="font-playfair font-normal tracking-tight flex flex-wrap justify-center items-center gap-3 md:gap-4 leading-[0.9] md:leading-[0.85] perspective-[1000px]">
+            <span className="text-[clamp(36px,7vw,96px)]">SELECTED</span>
+            <span className="text-[clamp(36px,7vw,96px)] italic text-[#C084FC]">WORKS</span>
           </h2>
           
           <div className="subtitle-block flex items-center justify-center mt-6 px-4">
@@ -305,14 +323,14 @@ export default function Projects() {
             </p>
           </div>
         </div>
-
-        <div className="h-[clamp(40px,6vh,80px)] shrink-0" />
-
-        <div className="relative w-full h-[clamp(450px,65svh,760px)] shrink-0">
+ 
+        <div className={isMobile ? 'h-8' : 'h-[clamp(40px,6vh,80px)] shrink-0'} />
+ 
+        <div className={`relative w-full ${isMobile ? 'h-auto overflow-x-auto scrollbar-none snap-x snap-mandatory px-6 pb-8 touch-pan-x' : 'h-[clamp(450px,65svh,760px)] overflow-hidden'} shrink-0`}>
           <div 
             ref={trackRef} 
-            className="absolute left-0 flex h-full items-center will-change-transform"
-            style={{ 
+            className={isMobile ? 'relative flex items-center gap-6' : 'absolute left-0 flex h-full items-center will-change-transform'}
+            style={isMobile ? {} : { 
               gap: 'clamp(24px, 4vw, 56px)',
               paddingLeft: 'calc(50vw - clamp(140px, 20vw, 230px))', 
               paddingRight: 'calc(50vw - clamp(140px, 20vw, 230px))'
@@ -321,8 +339,8 @@ export default function Projects() {
             {projects.map((project, i) => (
               <div 
                 key={project.id} 
-                className="project-card-wrapper shrink-0 relative cursor-none group will-change-transform"
-                style={{ width: 'clamp(320px, 45svh, 520px)', height: 'clamp(450px, 65svh, 760px)', opacity: 0.6, transform: 'scale(0.90)' }}
+                className={`project-card-wrapper shrink-0 relative cursor-none group will-change-transform ${isMobile ? 'snap-center' : ''}`}
+                style={isMobile ? { width: '280px', height: '440px', opacity: 1, transform: 'scale(1)' } : { width: 'clamp(320px, 45svh, 520px)', height: 'clamp(450px, 65svh, 760px)', opacity: 0.6, transform: 'scale(0.90)' }}
                 onMouseEnter={handleCardMouseEnter}
                 onMouseLeave={handleCardMouseLeave}
               >
@@ -330,7 +348,7 @@ export default function Projects() {
                    <div className="w-full h-full bg-[radial-gradient(ellipse_at_center,_rgba(192,132,252,0.12)_0%,_transparent_65%)] animate-breathe" />
                 </div>
                 
-                <div className="w-full h-full animate-float-card group-hover:-translate-y-[6px] transition-transform duration-700 ease-[cubic-bezier(0.19,1,0.22,1)]" style={{ animationDelay: `${i * -1.5}s` }}>
+                <div className={`w-full h-full ${isMobile ? '' : 'animate-float-card'} group-hover:-translate-y-[6px] transition-transform duration-700 ease-[cubic-bezier(0.19,1,0.22,1)]`} style={isMobile ? {} : { animationDelay: `${i * -1.5}s` }}>
                   
                   {/* Steady Background Glow */}
                   <div className="absolute inset-[-40px] pointer-events-none opacity-0 active-glow-container -z-10" style={{ transform: 'translateZ(-10px)' }}>
