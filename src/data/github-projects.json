@@ -22,7 +22,7 @@
     "created_at": "1 Feb 2026",
     "license": null,
     "is_open_source": true,
-    "image": "/projects/ai-resume-screening-system/cover.png"
+    "image": "/projects/ai-resume-screening-system/cover.webp"
   },
   {
     "id": "1187399795",
@@ -51,7 +51,7 @@
     "created_at": "20 Mar 2026",
     "license": null,
     "is_open_source": true,
-    "image": "/projects/-Sri-Sai-Traders-website/cover.png"
+    "image": "/projects/-Sri-Sai-Traders-website/cover.webp"
   },
   {
     "id": "1264978058",
@@ -70,7 +70,7 @@
     "created_at": "10 Jun 2026",
     "license": null,
     "is_open_source": true,
-    "image": "/projects/i2flow/cover.png"
+    "image": "/projects/i2flow/cover.webp"
   },
   {
     "id": "1259447408",
@@ -89,7 +89,7 @@
     "created_at": "4 Jun 2026",
     "license": null,
     "is_open_source": true,
-    "image": "/projects/Builderestate/cover.png"
+    "image": "/projects/Builderestate/cover.webp"
   },
   {
     "id": "1285069581",
@@ -108,7 +108,7 @@
     "created_at": "30 Jun 2026",
     "license": null,
     "is_open_source": true,
-    "image": "/projects/nizams-royal-restaurant/cover.png"
+    "image": "/projects/nizams-royal-restaurant/cover.webp"
   },
   {
     "id": "1210340600",
@@ -127,6 +127,6 @@
     "created_at": "14 Apr 2026",
     "license": null,
     "is_open_source": true,
-    "image": "/projects/EvoDoc-Flow/cover.png"
+    "image": "/projects/EvoDoc-Flow/cover.webp"
   }
 ]
